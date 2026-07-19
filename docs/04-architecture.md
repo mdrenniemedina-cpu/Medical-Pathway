@@ -5,6 +5,8 @@
 > **Changelog v2:** tras identificar la espera de resolución de homologación como el momento de mayor dolor (`research/08-momento-critico-espera.md`), el componente de mayor prioridad de construcción deja de ser el rastreador de roadmap genérico y pasa a ser el **motor de agregación anónima de tiempos de espera** ("Radar de Espera"). Ver `decisions/ADR-007` y `decisions/ADR-008`.
 >
 > **Changelog v3:** el founder corrigió el alcance — el producto es el recorrido completo del médico (descubrir → comparar → planificar → acompañar), y el Radar de Espera se **anida** dentro de la etapa de acompañamiento como su funcionalidad diferenciadora, no como el producto entero. Se revive el motor de descubrimiento/comparación personalizada y el plan paso a paso (presentes en v1, retirados en v2), ahora con la disciplina de profundidad asimétrica por destino que v2 introdujo. Ver `decisions/ADR-009`.
+>
+> **Changelog v4:** el founder afinó el recorrido a **4 preguntas humanas** (Descubrir / Planificar / Acompañar / Continuar — la "comparación" queda absorbida dentro de Descubrir, como parte del mismo resultado explicado) y pidió diseñar primero el dominio (DDD) antes de esquema o API. El modelo de datos de este documento queda **superseded** por `05-domain-model-ddd.md` (dominio) y `06-database-schema.md` (esquema concreto) — este documento mantiene la vista de componentes de alto nivel y remite a los documentos detallados para cada pieza (API en `07-api-contracts.md`, autenticación en `08-auth-model.md`, sprints en `10-technical-roadmap-sprints.md`, riesgos en `11-riesgos-tecnicos-mitigacion.md`, escalamiento en `12-estrategia-escalamiento-multipais.md`, calidad de datos en `13-calidad-confianza-datos-radar.md`, retención en `14-estrategia-retencion-engagement.md`). Ver `decisions/ADR-010` a `ADR-014`.
 
 ## 1. Principios de diseño
 
@@ -14,17 +16,18 @@
 4. **Privacidad y datos sensibles por diseño.** El gestor documental maneja pasaportes, títulos y datos profesionales — cifrado en reposo, control de acceso estricto, cumplimiento GDPR (usuarios que interactúan con autoridades españolas/UE) y normativas de protección de datos LatAm (ADR-003).
 5. **Instrumentación desde el día uno.** Las métricas de éxito del MVP (retención, conversión, distribución de origen) son la forma de confirmar o refutar las hipótesis estratégicas documentadas — no son un "nice to have" posterior.
 
-## 2. El recorrido de 5 etapas (marco de producto)
+## 2. El recorrido de 4 preguntas humanas (marco de producto)
 
-| Etapa | Pregunta que responde | Alcance (los 9 destinos) | Alcance (España) |
-|---|---|---|---|
-| 1. Descubrimiento | "¿A dónde puedo ir?" | Motor de coincidencia transparente sobre datos ya investigados (radar) | Igual, sin trato especial |
-| 2. Comparación personalizada | "¿Cuál me conviene más entre mis opciones?" | Comparación en profundidad del shortlist con explicación de cada recomendación | Igual, sin trato especial |
-| 3. Plan paso a paso | "¿Qué tengo que hacer, y en qué orden?" | Roadmap genérico/ligero por destino (a partir del contenido ya investigado en `research/01-03`) | Roadmap profundo con checklist accionable |
-| 4. Acompañamiento | "¿Cómo llevo esto sin perderme ni ser estafado?" | Comunidad y alertas genéricas | Comunidad, checklist y gestor documental activos |
-| 5. Radar de Espera *(anidado en la etapa 4)* | "¿Cuánto voy a esperar, realmente?" | Solo disponible donde exista un paso de espera modelado (ninguno más en el MVP) | Activo — anidado en el paso de homologación |
+| Etapa | Pregunta del usuario | Bounded context(s) que la sirven (ver `05-domain-model-ddd.md`) | Alcance (los 9 destinos) | Alcance (España) |
+|---|---|---|---|---|
+| 1. Descubrir | "¿Cuál es el mejor país para mí?" | Descubrimiento y Compatibilidad + Catálogo | Motor de coincidencia transparente y explicable (compatibilidad % + razones) sobre los 9 destinos | Igual, sin trato especial — el motor no favorece a España artificialmente |
+| 2. Planificar | "¿Qué tengo que hacer ahora?" | Ruta del Médico + Catálogo | Roadmap ligero por destino, reutilizando `research/01-03` | Roadmap profundo, personalizado por perfil, con checklist accionable |
+| 3. Acompañar | "¿Voy bien?" | Ruta del Médico + **Radar de Espera** (anidado) | Solo disponible donde exista una etapa de tipo "espera" modelada | Radar de Espera activo: distribución de tiempos por cohorte, no un contador simple |
+| 4. Continuar | "¿Qué sigue?" | Comunidad + Notificaciones + Oportunidades | Comunidad y alertas genéricas + directorio anti-estafa mínimo | Igual profundidad que el resto — esta etapa no es España-específica por naturaleza |
 
-La etapa 5 no es una etapa separada del recorrido del usuario: es una funcionalidad que aparece **dentro** del paso de homologación de la etapa 4, cuando el usuario llega ahí. Se modela de forma genérica (ligada a cualquier `PathwayStep`, no solo a España) para poder activarse en el futuro sobre otros pasos de espera conocidos (p. ej. la cita del Kenntnisprüfung en Alemania, la verificación de fuente en Canadá) sin rediseño, aunque en el MVP solo se puebla de contenido y lógica para España.
+**Importante — esto es lenguaje de usuario, no arquitectura de módulos:** un bounded context no es una pantalla. La "etapa 3" no es un módulo de código — es la pregunta que el usuario hace cuando llega a una etapa de tipo espera dentro de su propia Ruta Personalizada, y ahí es donde el contexto Radar de Espera aparece, anidado, sin ser su propia pantalla independiente. El Radar de Espera se modela de forma completamente genérica (ligado a cualquier `EtapaPersonalizada` de tipo `espera`, no solo a España) para poder activarse en el futuro sobre otros pasos de espera conocidos (la cita del Kenntnisprüfung en Alemania, la verificación de fuente en Canadá) sin rediseño — ver `12-estrategia-escalamiento-multipais.md`.
+
+Ver `05-domain-model-ddd.md` para el detalle completo de bounded contexts, agregados, invariantes y eventos de dominio que hacen operativo este recorrido.
 
 ## 3. Componentes del sistema (MVP v3)
 
@@ -79,7 +82,7 @@ La etapa 5 no es una etapa separada del recorrido del usuario: es una funcionali
 
 **Motor de Descubrimiento — cómo funciona (importante: no es un modelo de IA):** es una función de puntuación determinista y explicable sobre atributos ya conocidos de cada destino (barrera de idioma, tiempo, coste, demanda, dificultad, complejidad regulatoria) frente a atributos del perfil del usuario (idiomas que domina, presupuesto, urgencia, tolerancia a examen competitivo vs. ruta más lenta pero segura, prioridad entre ingreso a largo plazo y rapidez de práctica). El resultado siempre se muestra con la razón ("te recomendamos España porque no hay barrera de idioma y tu presupuesto es limitado; Alemania aparece como alternativa a considerar si priorizas ingreso a largo plazo pese a la barrera de idioma"). Esto es deliberadamente distinto de un motor de IA de recomendación: sigue siendo válida la decisión de no usar IA para esto (ver `decisions/ADR-002`) porque un sistema de reglas transparente no tiene el riesgo de "autoridad falsa" que sí tiene un modelo opaco entrenado sin suficiente contenido verificado por destino.
 
-## 4. Modelo de datos (alto nivel)
+## 4. Modelo de datos (alto nivel — ver `05-domain-model-ddd.md` y `06-database-schema.md` para el detalle autoritativo)
 
 - **User / Profile:** datos de onboarding **enriquecidos para el motor de descubrimiento** — país de origen, especialidad, años de experiencia, idiomas que domina (además de español), presupuesto aproximado, urgencia/tiempo disponible, tolerancia a examen competitivo vs. ruta más lenta pero segura, prioridad entre ingreso a largo plazo y rapidez de práctica, destino(s) de interés explícito si ya los tiene, nivel de verificación, rol.
 - **Destination:** uno por país (9 en catálogo), con metadatos del radar (tiempo, coste, idioma, demanda, dificultad, complejidad regulatoria) — cada campo con `source_url` y `verified_at`. Es la base de datos que alimenta tanto el Motor de Descubrimiento como la Comparación personalizada.

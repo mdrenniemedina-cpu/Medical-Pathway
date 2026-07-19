@@ -50,12 +50,21 @@ Actuando como Product Manager, UX Researcher, Arquitecto de Software y CTO, con 
 | Cuestionamiento de la propuesta de producto | Completo — propuesta pendiente de validación del founder | `docs/research/06-product-strategy-cuestionamiento.md` |
 | Matriz de decisión España vs. Alemania | Completo | `docs/research/07-matriz-beachhead-espana-alemania.md` |
 | Momento crítico del recorrido (input al MVP) | Completo | `docs/research/08-momento-critico-espera.md` |
-| Definición del MVP | **v3 — recorrido completo de 5 etapas, Radar de Espera anidado en España** | `docs/03-mvp-definition.md` |
-| Arquitectura del sistema | **v3 — motor de descubrimiento/comparación + roadmap + Radar de Espera anidado** | `docs/04-architecture.md` |
+| Definición del MVP | **v3 — recorrido completo (Descubrir/Planificar/Acompañar/Continuar), Radar de Espera anidado en España** | `docs/03-mvp-definition.md` |
+| Arquitectura del sistema (vista de alto nivel) | **v4 — recorrido de 4 preguntas humanas, remite al modelo de dominio detallado** | `docs/04-architecture.md` |
+| Modelo de dominio (DDD) | Completo | `docs/05-domain-model-ddd.md` |
+| Esquema de base de datos | Completo | `docs/06-database-schema.md` |
+| Contratos de API | Completo | `docs/07-api-contracts.md` |
+| Modelo de autenticación y autorización | Completo | `docs/08-auth-model.md` |
 | Recomendación final (6 meses, recursos limitados) | Completo | `docs/09-recomendacion-final-6-meses.md` |
-| Registro de decisiones (ADR) | 9 decisiones documentadas | `docs/decisions/` |
+| Roadmap técnico por sprints | Completo | `docs/10-technical-roadmap-sprints.md` |
+| Riesgos técnicos y mitigación | Completo | `docs/11-riesgos-tecnicos-mitigacion.md` |
+| Estrategia de escalamiento multi-país | Completo | `docs/12-estrategia-escalamiento-multipais.md` |
+| Calidad y confianza de datos del Radar | Completo | `docs/13-calidad-confianza-datos-radar.md` |
+| Estrategia de retención y engagement | Completo | `docs/14-estrategia-retencion-engagement.md` |
+| Registro de decisiones (ADR) | 14 decisiones documentadas | `docs/decisions/` |
 
-**Decisiones ya validadas por el founder:** ADR-001 (España como beachhead), ADR-002 (núcleo = confianza/navegación, no comparador — refinado por ADR-009), ADR-007 (Radar de Espera como funcionalidad diferenciadora, alcance corregido por ADR-009), ADR-008 (datos agregados anónimos como foso), ADR-009 (el producto es el recorrido completo de 5 etapas; Radar de Espera anidado, no reemplaza la visión). Pendiente de validación explícita: ADR-003 (monetización adelantada por referidos, diferida a Fase 2).
+**Decisiones ya validadas por el founder:** ADR-001 (España como beachhead), ADR-002 (núcleo = confianza/navegación, no comparador — refinado por ADR-009), ADR-007 (Radar de Espera como funcionalidad diferenciadora, alcance corregido por ADR-009), ADR-008 (datos agregados anónimos como foso), ADR-009 (recorrido completo, Radar anidado), ADR-010 a ADR-014 (diseño de dominio DDD, separación Cuenta/Perfil, extensibilidad multi-país, motor de confianza de datos, mecanismos de retención). Pendiente de validación explícita: ADR-003 (monetización adelantada por referidos, diferida a Fase 2).
 
 ## 7. Preguntas abiertas / riesgos identificados hasta ahora
 
