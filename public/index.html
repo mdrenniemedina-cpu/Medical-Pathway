@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Medical Pathway — Sprint 1 (prototipo de validación)</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <h1>Medical Pathway</h1>
+  <p><em>Prototipo del Sprint 1 — construido para validar la propuesta de valor, no para lucir bien.</em></p>
+
+  <h2>Crear cuenta o iniciar sesión</h2>
+  <label>Email</label>
+  <input id="email" type="email" placeholder="tu@email.com" />
+  <label>Contraseña</label>
+  <input id="password" type="password" placeholder="mínimo 8 caracteres" />
+  <button id="btnRegistro">Crear cuenta</button>
+  <button id="btnLogin">Iniciar sesión</button>
+  <p class="error" id="error"></p>
+
+  <script src="/app.js"></script>
+  <script>
+    /**
+     * Tras el registro, el Perfil Internacional se crea de forma asíncrona
+     * (evento de dominio -> outbox -> suscriptor, ver Sprint 0) — no es
+     * instantáneo. Se reintenta brevemente en vez de asumir que ya existe.
+     */
+    async function esperarPerfil(intentos = 10) {
+      for (let i = 0; i < intentos; i++) {
+        try {
+          return await api('/perfil/me');
+        } catch (e) {
+          await new Promise((r) => setTimeout(r, 400));
+        }
+      }
+      throw new Error('Tu perfil está tardando en crearse. Recarga esta página en unos segundos.');
+    }
+
+    async function entrar(path) {
+      document.getElementById('error').textContent = '';
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      try {
+        const data = await api(path, { method: 'POST', body: JSON.stringify({ email, password }) });
+        setToken(data.accessToken);
+        const perfil = await esperarPerfil();
+        setPerfilId(perfil.perfilId);
+        window.location.href = '/onboarding.html';
+      } catch (e) {
+        document.getElementById('error').textContent = e.message;
+      }
+    }
+    document.getElementById('btnRegistro').addEventListener('click', () => entrar('/identidad/registro'));
+    document.getElementById('btnLogin').addEventListener('click', () => entrar('/identidad/login'));
+  </script>
+</body>
+</html>

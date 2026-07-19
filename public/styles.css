@@ -1,0 +1,23 @@
+/* Estilo deliberadamente mínimo — Sprint 1 valida propuesta de valor, no estética. */
+body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; color: #222; line-height: 1.4; }
+h1 { font-size: 1.4rem; }
+h2 { font-size: 1.1rem; margin-top: 2rem; }
+label { display: block; margin-top: 0.75rem; font-weight: 600; }
+input, select { width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box; }
+button { margin-top: 1rem; padding: 0.5rem 1rem; cursor: pointer; }
+.error { color: #b00020; }
+.card { border: 1px solid #ccc; border-radius: 4px; padding: 1rem; margin: 1rem 0; }
+.pct { font-size: 1.5rem; font-weight: bold; }
+.razon { padding: 0.25rem 0; border-bottom: 1px dotted #ddd; }
+.razon.negativo { color: #b00020; }
+.razon.positivo { color: #146c2e; }
+.accion { background: #fff8e1; padding: 0.5rem; margin-top: 0.5rem; border-left: 3px solid #f9a825; }
+.timeline-etapa { border-left: 3px solid #888; padding-left: 0.75rem; margin-bottom: 0.75rem; }
+.timeline-etapa.opcional { border-left-color: #bbb; opacity: 0.75; }
+.timeline-etapa.espera { border-left-color: #1565c0; }
+.fake-door { border: 1px dashed #1565c0; padding: 0.75rem; margin-top: 1rem; }
+.fuente { font-size: 0.75rem; color: #666; }
+details summary { cursor: pointer; font-weight: 600; }
+nav { margin-bottom: 1.5rem; font-size: 0.9rem; }
+nav a { margin-right: 1rem; }
+progress { width: 100%; }

@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { ResultadoDescubrimiento } from '../domain/resultado-descubrimiento.aggregate';
 import { calcularPuntuaciones } from '../domain/servicios/motor-compatibilidad.service';
+import { AccionRecomendada, analizarBrechas } from '../domain/servicios/analizador-brechas.service';
 import {
   RESULTADO_REPOSITORY,
   ResultadoRepositoryPort,
@@ -32,6 +33,11 @@ export class CalcularDescubrimientoUseCase {
     const reglasVersion = reglasActivas[0]?.version ?? 1;
     const resultado = ResultadoDescubrimiento.crear(nanoid(), perfilId, reglasVersion, puntuaciones);
     await this.resultados.guardar(resultado);
-    return toResultadoView(resultado);
+
+    const accionesPorDestino = new Map<string, AccionRecomendada[]>();
+    for (const destino of destinos) {
+      accionesPorDestino.set(destino.destinoId, analizarBrechas(perfil, destino, reglasActivas));
+    }
+    return toResultadoView(resultado, accionesPorDestino);
   }
 }

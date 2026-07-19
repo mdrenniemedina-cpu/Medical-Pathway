@@ -1,7 +1,7 @@
 import { AggregateRoot } from '@shared-kernel/domain/aggregate-root.base';
 import { DomainError } from '@shared-kernel/domain/domain-error';
 import { PuntuacionDestino } from './value-objects/puntuacion-destino.vo';
-import { DestinoSeleccionadoEvent } from './events/descubrimiento-eventos';
+import { DescubrimientoCompletadoEvent, DestinoSeleccionadoEvent } from './events/descubrimiento-eventos';
 
 export interface ResultadoDescubrimientoProps {
   id: string;
@@ -26,7 +26,17 @@ export class ResultadoDescubrimiento extends AggregateRoot {
     if (puntuaciones.length === 0) {
       throw new DomainError('Un resultado de descubrimiento debe tener al menos una puntuación.', 'RESULTADO_SIN_PUNTUACIONES');
     }
-    return new ResultadoDescubrimiento({ id, perfilId, reglasVersion, generadoEn: new Date(), puntuaciones });
+    const resultado = new ResultadoDescubrimiento({ id, perfilId, reglasVersion, generadoEn: new Date(), puntuaciones });
+    const top = [...puntuaciones].sort((a, b) => b.porcentajeCompatibilidad - a.porcentajeCompatibilidad)[0];
+    resultado.raise(
+      new DescubrimientoCompletadoEvent(id, {
+        perfilId,
+        reglasVersion,
+        destinoTopId: top.destinoId,
+        destinoTopPorcentaje: top.porcentajeCompatibilidad,
+      }),
+    );
+    return resultado;
   }
 
   static reconstituir(props: ResultadoDescubrimientoProps): ResultadoDescubrimiento {

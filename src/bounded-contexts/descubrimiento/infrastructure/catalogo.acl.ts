@@ -24,6 +24,7 @@ export class CatalogoAcl implements DestinosParaCompararPort {
       destinoId: destino.id,
       nombre: destino.nombre,
       idiomaRequerido: destino.idiomaRequerido,
+      nivelIdiomaRequerido: destino.nivelIdiomaRequerido,
       nivelDemanda: destino.nivelDemanda.valor as DestinoParaComparar['nivelDemanda'],
       tiempoTipicoMeses: destino.tiempoTipicoMeses.valor,
       complejidadRegulatoria: destino.complejidadRegulatoria.valor as DestinoParaComparar['complejidadRegulatoria'],

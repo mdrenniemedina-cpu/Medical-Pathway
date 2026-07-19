@@ -8,6 +8,7 @@ export { CatalogoModule } from '../infrastructure/catalogo.module';
 export { CatalogoQueryService } from '../application/catalogo-query.service';
 export type { DestinoView, AtributoConFuenteView } from '../application/destino-view';
 export type { RutaHomologacionView, EtapaRutaView } from '../application/ruta-homologacion-view';
+export type { ProyeccionRutaView, EtapaProyectadaView } from '../application/proyeccion-view';
 export {
   RutaHomologacionPublicadaEvent,
   RutaHomologacionActualizadaEvent,

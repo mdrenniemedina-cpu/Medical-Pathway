@@ -7,6 +7,7 @@ import {
 } from '../domain/catalogo.repository.port';
 import { DestinoView, toDestinoView } from './destino-view';
 import { EtapaRutaView, RutaHomologacionView, toRutaHomologacionView } from './ruta-homologacion-view';
+import { ProyeccionRutaView, toProyeccionView } from './proyeccion-view';
 
 /**
  * Servicio de lectura del Catálogo — es lo único que otros contextos
@@ -37,6 +38,11 @@ export class CatalogoQueryService {
     if (!ruta) throw new NotFoundException('No hay una ruta de homologación publicada para este destino.');
     return toRutaHomologacionView(ruta);
   }
+
+  async obtenerProyeccionDeDestino(destinoId: string): Promise<ProyeccionRutaView> {
+    const ruta = await this.obtenerRutaPublicadaDeDestino(destinoId);
+    return toProyeccionView(ruta);
+  }
 }
 
-export type { EtapaRutaView, RutaHomologacionView };
+export type { EtapaRutaView, RutaHomologacionView, ProyeccionRutaView };

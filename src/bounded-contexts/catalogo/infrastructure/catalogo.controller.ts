@@ -2,6 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { CatalogoQueryService } from '../application/catalogo-query.service';
 import { DestinoView } from '../application/destino-view';
 import { RutaHomologacionView } from '../application/ruta-homologacion-view';
+import { ProyeccionRutaView } from '../application/proyeccion-view';
 
 @Controller('catalogo')
 export class CatalogoController {
@@ -20,5 +21,10 @@ export class CatalogoController {
   @Get('destinos/:id/ruta')
   async obtenerRuta(@Param('id') id: string): Promise<RutaHomologacionView> {
     return this.catalogo.obtenerRutaPublicadaDeDestino(id);
+  }
+
+  @Get('destinos/:id/proyeccion')
+  async obtenerProyeccion(@Param('id') id: string): Promise<ProyeccionRutaView> {
+    return this.catalogo.obtenerProyeccionDeDestino(id);
   }
 }

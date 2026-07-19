@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Tu futuro — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav><a href="/index.html">Inicio</a> <a href="/resultados.html">Volver a resultados</a></nav>
+  <h1>Así se vería tu camino</h1>
+  <p>No es solo una lista de pasos — es una proyección en el tiempo, calculada a partir de datos reales con fuente citada.</p>
+  <div id="proyeccion">Calculando proyección…</div>
+
+  <script src="/app.js"></script>
+  <script>
+    requireAuth();
+    const destinoId = new URLSearchParams(location.search).get('destinoId');
+
+    function renderEtapa(e) {
+      const clases = ['timeline-etapa', e.tipo === 'espera' ? 'espera' : '', e.esOpcional ? 'opcional' : ''].filter(Boolean).join(' ');
+      let html = `
+        <div class="${clases}">
+          <strong>Mes ${e.mesInicioEstimado} – ${e.mesFinEstimado}:</strong> ${e.nombre}${e.esOpcional ? ' (opcional)' : ''}
+          <div class="fuente">Fuente: <a href="${e.fuenteUrl}" target="_blank" rel="noopener">${e.fuenteUrl}</a> · verificado ${e.fechaVerificacion.slice(0, 10)}</div>
+        </div>`;
+
+      if (e.tipo === 'espera') {
+        html += `
+          <div class="fake-door">
+            <p><strong>Esta es la etapa más larga e incierta de todo el proceso.</strong></p>
+            <button data-accion="interes-radar">Quiero saber cuánto están tardando otros médicos como yo (Radar de Espera)</button>
+            <p id="msg-radar" style="display:none">Gracias — todavía no existe esta funcionalidad, pero tu interés queda registrado para priorizarla.</p>
+          </div>`;
+      }
+      return html;
+    }
+
+    async function cargar() {
+      try {
+        const proyeccion = await api(`/catalogo/destinos/${destinoId}/proyeccion`);
+        track('proyeccion_visualizada', { destinoId, totalMesesEstimado: proyeccion.totalMesesEstimado });
+
+        const etapasHtml = proyeccion.etapas.map(renderEtapa).join('');
+        document.getElementById('proyeccion').innerHTML = `
+          <p><strong>Duración total estimada:</strong> ${proyeccion.totalMesesEstimadoSinOpcionales} meses (sin contar pasos opcionales) · ${proyeccion.totalMesesEstimado} meses si recorres también los opcionales.</p>
+          ${etapasHtml}
+          <div class="fake-door">
+            <p><strong>¿Quieres hablar con alguien que ya vivió este proceso?</strong></p>
+            <button data-accion="interes-comunidad">Quiero contactar a un médico que ya lo logró</button>
+            <p id="msg-comunidad" style="display:none">Gracias — todavía no existe esta comunidad, pero tu interés queda registrado para priorizarla.</p>
+          </div>
+        `;
+      } catch (e) {
+        document.getElementById('proyeccion').innerHTML = `<p class="error">${e.message}</p>`;
+      }
+    }
+
+    document.getElementById('proyeccion').addEventListener('click', (ev) => {
+      const el = ev.target.closest('[data-accion]');
+      if (!el) return;
+      if (el.getAttribute('data-accion') === 'interes-comunidad') {
+        track('interes_comunidad_expresado', { destinoId });
+        document.getElementById('msg-comunidad').style.display = 'block';
+        el.disabled = true;
+      } else if (el.getAttribute('data-accion') === 'interes-radar') {
+        track('interes_radar_expresado', { destinoId });
+        document.getElementById('msg-radar').style.display = 'block';
+        el.disabled = true;
+      }
+    });
+
+    cargar();
+  </script>
+</body>
+</html>

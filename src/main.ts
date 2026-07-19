@@ -11,6 +11,10 @@ async function bootstrap(): Promise<void> {
   app.useLogger(app.get(PinoLoggerService));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors();
+  // Prefijo global de API (ver `07-api-contracts.md`) — deja la raíz '/' libre
+  // para el frontend estático servido por ServeStaticModule (Sprint 1).
+  app.setGlobalPrefix('api/v1');
 
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT') ?? 3000;

@@ -63,9 +63,12 @@ Actuando como Product Manager, UX Researcher, Arquitecto de Software y CTO, con 
 | Calidad y confianza de datos del Radar | Completo | `docs/13-calidad-confianza-datos-radar.md` |
 | Estrategia de retención y engagement | Completo | `docs/14-estrategia-retencion-engagement.md` |
 | Sprint 0: esqueleto técnico | **Completo y validado (build, lint, migraciones, arranque real, endpoint end-to-end probado)** | `docs/15-sprint-0-entregables.md` |
-| Registro de decisiones (ADR) | 20 decisiones documentadas | `docs/decisions/` |
+| Sprint 1: validación de propuesta de valor | **Completo — software funcionando + informe de producto honesto (sin datos de usuarios reales fabricados)** | `docs/16-hipotesis-sprint-1.md`, `docs/17-informe-sprint-1.md` |
+| Registro de decisiones (ADR) | 23 decisiones documentadas | `docs/decisions/` |
 
 **Decisiones ya validadas por el founder:** ADR-001 (España como beachhead), ADR-002 (núcleo = confianza/navegación, no comparador — refinado por ADR-009), ADR-007 (Radar de Espera como funcionalidad diferenciadora, alcance corregido por ADR-009), ADR-008 (datos agregados anónimos como foso), ADR-009 (recorrido completo, Radar anidado), ADR-010 a ADR-014 (diseño de dominio DDD, separación Cuenta/Perfil, extensibilidad multi-país, motor de confianza de datos, mecanismos de retención). Pendiente de validación explícita: ADR-003 (monetización adelantada por referidos, diferida a Fase 2).
+
+**Bloqueador identificado en Sprint 1 (ver `docs/17-informe-sprint-1.md` §6):** ninguna hipótesis de negocio puede validarse sin usuarios reales — reclutar 5-10 médicos/estudiantes de prueba (beachhead: Colombia/Venezuela) es la prioridad antes de invertir más ingeniería en Sprint 2.
 
 ## 7. Preguntas abiertas / riesgos identificados hasta ahora
 

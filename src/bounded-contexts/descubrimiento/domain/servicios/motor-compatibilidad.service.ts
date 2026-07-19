@@ -17,10 +17,14 @@ export interface DestinoParaComparar {
   destinoId: string;
   nombre: string;
   idiomaRequerido: string | null;
+  nivelIdiomaRequerido: string | null;
   nivelDemanda: 'baja' | 'media' | 'alta' | 'muy_alta';
   tiempoTipicoMeses: number;
   complejidadRegulatoria: 'baja' | 'media' | 'alta' | 'muy_alta';
 }
+
+/** Criterios que el usuario puede cambiar cambiando su propio perfil — el resto son estructurales del destino (ver AnalizadorDeBrechas). */
+export const CRITERIOS_ACCIONABLES_POR_PERFIL = ['barrera_idioma'] as const;
 
 const NIVEL_A_PUNTOS: Record<string, number> = { baja: 10, media: 20, alta: 30, muy_alta: 40 };
 

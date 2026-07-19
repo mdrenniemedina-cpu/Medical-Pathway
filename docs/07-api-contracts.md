@@ -132,3 +132,31 @@ GET    /api/v1/notificaciones/preferencias    → 200
 PUT    /api/v1/notificaciones/preferencias    { canal_email, canal_push, frecuencia_maxima } → 200
 GET    /api/v1/notificaciones/mias            → 200 lista paginada de Alerta
 ```
+
+## Adiciones del Sprint 1
+
+> Nota de implementación: el código real usa `camelCase` en el JSON (no `snake_case` como los ejemplos originales de este documento, que databan de un borrador previo a la implementación) — los ejemplos nuevos abajo reflejan el formato real devuelto por la API.
+
+```
+GET    /api/v1/catalogo/destinos/{id}/proyeccion      → 200 ProyeccionRutaView (línea de tiempo acumulada, "visualizar tu futuro")
+POST   /api/v1/analitica/eventos                      { tipoEvento, perfilId?, propiedades? } → 201 (solo eventos de interacción de UI, ver AnalyticsController)
+```
+
+`POST /descubrimiento/calcular` ahora incluye, por cada destino, `accionesRecomendadas: AccionRecomendada[]` — el motor de brechas 100% trazable (ver `decisions/ADR-022`):
+```json
+{
+  "destinoId": "destino-alemania",
+  "porcentajeCompatibilidad": 9,
+  "razones": [ "..." ],
+  "accionesRecomendadas": [
+    {
+      "criterio": "barrera_idioma",
+      "descripcionAccion": "Aprender aleman a nivel B2/C1 y registrarlo en tu perfil",
+      "impactoEstimadoPuntos": 40,
+      "porcentajeResultanteEstimado": 49
+    }
+  ]
+}
+```
+
+Eventos automáticos derivados de dominio (no se disparan desde el frontend, ver `decisions/ADR-021`): `recomendacion_generada` (desde `DescubrimientoCompletado`), `inicio_de_ruta` (desde `DestinoSeleccionado`), `etapa_espera_alcanzada` (desde `EntroAEtapaDeEspera`).

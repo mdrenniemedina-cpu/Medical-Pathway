@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Tu compatibilidad — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <nav><a href="/index.html">Inicio</a> <a href="/onboarding.html">Editar mi perfil</a></nav>
+  <h1>¿Cuál es el mejor país para ti?</h1>
+  <p>No es un comparador — cada porcentaje viene con sus razones, y con lo que te falta para mejorar en cada destino.</p>
+  <div id="resultados">Calculando tu compatibilidad…</div>
+
+  <script src="/app.js"></script>
+  <script>
+    requireAuth();
+    let resultadoIdActual = null;
+
+    function claseRazon(aporte) {
+      return aporte < 0 ? 'razon negativo' : 'razon positivo';
+    }
+
+    function renderPuntuacion(p) {
+      const razonesHtml = p.razones
+        .map((r) => `<div class="${claseRazon(r.aportePuntos)}">${r.aportePuntos >= 0 ? '+' : ''}${r.aportePuntos} — ${r.explicacionLegible}</div>`)
+        .join('');
+
+      const accionesHtml = p.accionesRecomendadas.length
+        ? p.accionesRecomendadas
+            .map(
+              (a) =>
+                `<div class="accion">${a.descripcionAccion}<br><small>Impacto estimado: +${a.impactoEstimadoPuntos} puntos (compatibilidad pasaría a ~${a.porcentajeResultanteEstimado}%)</small></div>`,
+            )
+            .join('')
+        : '<p><small>No hay una acción de perfil identificada que mejore esta compatibilidad con las reglas actuales.</small></p>';
+
+      return `
+        <div class="card" data-destino-id="${p.destinoId}">
+          <div class="pct">${p.destinoId} — Compatibilidad ${p.porcentajeCompatibilidad}%</div>
+          <details>
+            <summary data-accion="explorar" data-destino-id="${p.destinoId}">Ver por qué (razones completas y trazables)</summary>
+            ${razonesHtml}
+          </details>
+          <details>
+            <summary data-accion="ver-acciones" data-destino-id="${p.destinoId}">¿Qué acciones aumentarían mis oportunidades aquí?</summary>
+            ${accionesHtml}
+          </details>
+          <button data-accion="ver-futuro" data-destino-id="${p.destinoId}">Ver mi futuro en este destino</button>
+          <button data-accion="iniciar-ruta" data-destino-id="${p.destinoId}">Iniciar esta ruta</button>
+        </div>`;
+    }
+
+    const explorados = new Set();
+    const accionesVistas = new Set();
+
+    document.getElementById('resultados').addEventListener('click', async (ev) => {
+      const el = ev.target.closest('[data-accion]');
+      if (!el) return;
+      const destinoId = el.getAttribute('data-destino-id');
+      const accion = el.getAttribute('data-accion');
+
+      if (accion === 'explorar' && !explorados.has(destinoId)) {
+        explorados.add(destinoId);
+        track('destino_explorado', { destinoId, resultadoId: resultadoIdActual });
+      } else if (accion === 'ver-acciones' && !accionesVistas.has(destinoId)) {
+        accionesVistas.add(destinoId);
+        track('acciones_recomendadas_vistas', { destinoId, resultadoId: resultadoIdActual });
+      } else if (accion === 'ver-futuro') {
+        window.location.href = `/proyeccion.html?destinoId=${destinoId}`;
+      } else if (accion === 'iniciar-ruta') {
+        try {
+          // Dispara DestinoSeleccionado en el dominio, que genera
+          // automáticamente el evento analítico `inicio_de_ruta` en el
+          // backend (ver DominioAAnaliticaSubscriber) — señal de servidor,
+          // no de frontend.
+          await api('/descubrimiento/seleccionar-destino', {
+            method: 'POST',
+            body: JSON.stringify({ resultadoId: resultadoIdActual, destinoId }),
+          });
+          alert('Ruta iniciada. En un sprint futuro esto llevará a tu plan personalizado paso a paso.');
+        } catch (e) {
+          alert('No se pudo iniciar la ruta: ' + e.message);
+        }
+      }
+    });
+
+    async function cargar() {
+      try {
+        const resultado = await api('/descubrimiento/calcular', { method: 'POST' });
+        resultadoIdActual = resultado.resultadoId;
+        history.replaceState(null, '', `/resultados.html?resultadoId=${resultado.resultadoId}`);
+        document.getElementById('resultados').innerHTML = resultado.puntuaciones.map(renderPuntuacion).join('');
+      } catch (e) {
+        document.getElementById('resultados').innerHTML = `<p class="error">${e.message}</p>`;
+      }
+    }
+    cargar();
+  </script>
+</body>
+</html>
