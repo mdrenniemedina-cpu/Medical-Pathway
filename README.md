@@ -39,8 +39,10 @@ Este repositorio está en fase de **investigación y diseño de producto/arquite
   - [`docs/20-discovery-metricas-e-instrumentos.md`](docs/20-discovery-metricas-e-instrumentos.md) — métricas e instrumentos de observación.
   - [`docs/21-discovery-criterios-decision.md`](docs/21-discovery-criterios-decision.md) — criterios de interpretación y marco de decisión (perseverar/pivotar/repriorizar), pre-registrados.
   - [`docs/22-discovery-evidencia-secundaria.md`](docs/22-discovery-evidencia-secundaria.md) — evidencia pública real (no fabricada) recopilada mientras se organizan las entrevistas.
-  - [`docs/23-informe-customer-discovery.md`](docs/23-informe-customer-discovery.md) — **informe de estado: qué es real, qué falta, y la decisión que necesito de ti para avanzar.**
-  - [`docs/discovery-templates/`](docs/discovery-templates/) — plantillas CSV listas para usar.
+  - [`docs/23-informe-customer-discovery.md`](docs/23-informe-customer-discovery.md) — **informe de estado: qué es real, qué falta, y los próximos pasos acordados.**
+  - [`docs/24-discovery-piloto-metodologia.md`](docs/24-discovery-piloto-metodologia.md) — fase piloto (3-5 entrevistas): valida el protocolo, no el producto; separa problema (Fase A) de observación del prototipo (Fase B).
+  - [`docs/25-discovery-guion-observacion-mvp.md`](docs/25-discovery-guion-observacion-mvp.md) — guión de observación think-aloud del prototipo real, solo tras cerrar la Fase A.
+  - [`docs/discovery-templates/`](docs/discovery-templates/) — plantillas CSV listas para usar (reclutamiento, métricas del estudio principal, y piloto por separado).
 
 ## Estado actual
 

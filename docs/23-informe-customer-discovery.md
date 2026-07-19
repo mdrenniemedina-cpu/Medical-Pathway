@@ -29,12 +29,19 @@ Dado que la única evidencia real disponible (secundaria) apunta a que el proble
 
 **No iniciar desarrollo de nueva funcionalidad de Sprint 2 hasta completar al menos las primeras 5-6 entrevistas reales** (no es necesario esperar las 15 completas para tener señal direccional útil, siguiendo la práctica estándar de discovery de revisar evidencia de forma incremental). Esto es coherente con tu instrucción de que la prioridad dejó de ser la ingeniería.
 
-## 4. Cómo proceder — necesito una decisión tuya, no puedo resolverla yo
+## 4. Decisión tomada: piloto de 3-5 contactos cercanos antes del estudio principal
 
-La ejecución de las entrevistas requiere a alguien con acceso a personas reales (tú, tu equipo, o un contacto/red que puedas movilizar). Para que esto avance, veo tres caminos, y necesito que elijas uno (o me digas cuál se ajusta a tu situación):
+El founder decidió empezar con **3-5 entrevistas piloto de su red cercana**, con dos objetivos que este informe distingue explícitamente de la validación de producto:
 
-1. **Tú o tu equipo conducen las entrevistas** usando el protocolo y las plantillas ya listas, y me compartes las notas/grabaciones/transcripciones a medida que las completan — yo las sintetizo contra los criterios pre-registrados (`21-discovery-criterios-decision.md`) y actualizo este informe con hallazgos reales.
-2. **Contratas o coordinas con un tercero** (un investigador de UX freelance, un servicio como User Interviews/Respondent, o alguien de tu red) para ejecutar el reclutamiento y las entrevistas siguiendo este protocolo, y yo me integro en la fase de síntesis.
-3. Si por ahora no es viable conseguir 10-15 entrevistas reales, **una alternativa de menor costo** (aunque más débil como evidencia) es que tú mismo converses informalmente con 3-5 contactos de tu red más cercana en los próximos días, siguiendo el protocolo, como una primera señal de bajo costo antes de invertir en el reclutamiento completo de `19-discovery-plan-reclutamiento.md`.
+1. **Validar el protocolo mismo** (no el problema, no el producto) — identificar preguntas confusas, sesgos del entrevistador, y confirmar que el instrumento extrae información útil, antes de invertir en el reclutamiento completo de 10-15 con cuotas de diversidad.
+2. **Separar dos preguntas que no deben mezclarse**: las primeras 2-3 entrevistas piloto son *solo problema* (Fase A, sin mostrar el producto); el resto de la muestra piloto añade una *Fase B* donde sí se muestra el prototipo real de Sprint 1 y se observa la interacción (think-aloud), siempre después de cerrar la Fase A. Ver la metodología completa en `24-discovery-piloto-metodologia.md` y el instrumento de observación en `25-discovery-guion-observacion-mvp.md`.
 
-Dime cuál de estos caminos vas a seguir (o si tienes uno distinto en mente) y qué necesitas de mí para avanzar — por ejemplo, puedo preparar el formulario de screener listo para publicar (Google Forms/Typeform), afinar el protocolo para un destino/segmento específico si decides acotar el reclutamiento inicial, o ayudarte a redactar los mensajes de invitación para tus canales concretos.
+**La evidencia de este piloto se mantiene explícitamente separada de la evidencia del estudio principal** (tracker propio, `discovery-templates/tracker-piloto.csv`, con columna `tipo_evidencia = piloto`) y no cuenta hacia los umbrales de decisión de `21-discovery-criterios-decision.md` — esos umbrales siguen reservados para el estudio principal de 10-15 con cuotas de diversidad.
+
+## 5. Qué sigue — y qué necesito de ti
+
+1. Agenda y conduce las 3-5 entrevistas piloto siguiendo `18-discovery-protocolo-entrevistas.md` (Fase A) y, para la segunda mitad de la muestra, `25-discovery-guion-observacion-mvp.md` (Fase B) — para esta última necesitas el prototipo corriendo (`npm run migrate && npm run seed && npm run start`, o una instancia desplegada).
+2. Compárteme las notas/grabaciones de cada entrevista piloto a medida que las completes (no hace falta esperar a las 5) — puedo ayudarte a sintetizarlas contra los criterios de éxito del protocolo (`24-discovery-piloto-metodologia.md` §3) y a decidir si el protocolo pasa a v2 antes del estudio principal.
+3. Una vez cerrado el piloto y revisado el protocolo, retomamos el reclutamiento completo de `19-discovery-plan-reclutamiento.md` (hoy en pausa deliberada).
+
+Sigo sin poder ejecutar directamente ninguna de estas conversaciones — mi función a partir de aquí es preparar cada instrumento, y sintetizar lo que tú recojas, contra los criterios ya pre-registrados.

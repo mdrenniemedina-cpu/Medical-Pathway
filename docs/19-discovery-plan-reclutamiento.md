@@ -1,4 +1,6 @@
-# Customer Discovery Sprint — Plan de reclutamiento
+# Customer Discovery Sprint — Plan de reclutamiento (estudio principal, 10-15 personas)
+
+> **Este reclutamiento está en pausa deliberada.** Por decisión del founder, primero se ejecuta un piloto de 3-5 contactos cercanos para validar el protocolo mismo (ver `24-discovery-piloto-metodologia.md`) — el reclutamiento de este documento (canales, screener, cuotas de diversidad) solo arranca después de revisar el protocolo con los resultados del piloto.
 
 ## Objetivo de la muestra
 

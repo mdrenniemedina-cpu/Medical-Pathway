@@ -1,6 +1,8 @@
-# Customer Discovery Sprint — Protocolo de entrevistas
+# Customer Discovery Sprint — Protocolo de entrevistas (v1 — Fase A: el problema)
 
 > Objetivo del sprint completo (recordatorio, para que cada pregunta de este protocolo se lea con ese propósito): **no confirmar que a la gente le gusta Medical Pathway — determinar si el problema que creemos resolver es lo bastante importante como para que alguien cambie su comportamiento por él.** Metodología base: *The Mom Test* (Rob Fitzpatrick) — preguntar por comportamiento pasado concreto, nunca por opiniones sobre el futuro o sobre nuestra idea.
+>
+> **Este documento es la Fase A únicamente (el problema, sin mostrar producto).** Antes de aplicarlo a la muestra completa de 10-15, se ejecuta primero sobre una muestra piloto de 3-5 contactos cercanos, específicamente para poner a prueba este protocolo (no el problema ni el producto) — ver `24-discovery-piloto-metodologia.md`. Tras el piloto, este documento puede revisarse a v2 con un changelog explícito de qué cambió y por qué. La Fase B (mostrar el prototipo y observar), aplicable solo a parte de la muestra piloto y luego opcionalmente al estudio principal, vive en un documento separado (`25-discovery-guion-observacion-mvp.md`) — nunca se ejecuta antes de cerrar esta Fase A completa.
 
 ## Reglas duras (para quien conduzca la entrevista)
 

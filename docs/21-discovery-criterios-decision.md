@@ -1,5 +1,7 @@
 # Customer Discovery Sprint — Criterios de interpretación y metodología de decisión
 
+> **Alcance: estudio principal (10-15 personas) únicamente.** La fase piloto (3-5 contactos cercanos, ver `24-discovery-piloto-metodologia.md`) no aporta evidencia hacia estos umbrales — es una muestra de conveniencia, demasiado pequeña y sesgada por diseño (red personal del founder) para leerse cuantitativamente, y su propósito es validar el protocolo, no el problema. Ningún resultado del piloto debe mover ninguno de los umbrales de abajo.
+
 > Pre-registrado **antes** de recolectar cualquier dato, siguiendo la misma disciplina de `docs/16-hipotesis-sprint-1.md`: definir qué contaría como evidencia a favor y qué contaría como evidencia en contra, antes de tener resultados que puedan sesgar la definición de "éxito". Si al final del sprint se siente la tentación de ajustar estos umbrales para que el resultado obtenido "cuente" como validación, esa tentación es en sí misma una señal de alerta y debe documentarse, no ejecutarse.
 
 ## 1. La pregunta que este sprint intenta responder
