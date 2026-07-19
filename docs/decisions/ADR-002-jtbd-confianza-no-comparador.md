@@ -1,7 +1,7 @@
 # ADR-002: El producto núcleo es confianza + navegación paso a paso, no comparación de países
 
 ## Estado
-Propuesta — pendiente de validación del founder
+Aceptada — confirmada por el founder. Refinada por ADR-007: el núcleo no es un roadmap/comunidad genérico, sino específicamente el momento de espera post-solicitud.
 
 ## Contexto
 El founder pidió explícitamente cuestionar si "comparar países" es el problema principal. La investigación de mercado y competencia muestra un patrón consistente en los 9 destinos: estafas activas (citas falsas, preguntas de examen robadas, cursos predatorios), comunidades fragmentadas sin hub confiable, y acusaciones de manipulación de datos oficiales. El problema recurrente y de mayor duración para el usuario no es decidir un país (una decisión que se resuelve en pocas sesiones), sino saber en quién confiar y qué hacer a continuación durante un proceso de 1 a 4+ años.

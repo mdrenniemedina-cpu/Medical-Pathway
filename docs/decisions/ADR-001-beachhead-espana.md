@@ -1,7 +1,7 @@
 # ADR-001: España como destino beachhead (profundidad de producto)
 
 ## Estado
-Propuesta — pendiente de validación del founder
+Aceptada — confirmada con matriz de decisión ponderada (`research/07-matriz-beachhead-espana-alemania.md`, España 4.4/5 vs. Alemania 2.4/5).
 
 ## Contexto
 El founder no quería asumir un único país destino sin evidencia. La investigación de campo (`research/01-04`) muestra que España es el destino con mayor volumen y crecimiento de homologaciones LatAm (30.303 en 2025 vs. 8.865 en 2024), sin barrera de idioma para hispanohablantes, sin competidor dominante, y con el patrón de estafas/desinformación más documentado de los 9 destinos — es decir, el lugar donde un producto de confianza + navegación tiene el mayor "quantum of pain" que resolver y el menor coste de construcción (no hay que modelar aprendizaje de idioma).

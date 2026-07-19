@@ -48,9 +48,14 @@ Actuando como Product Manager, UX Researcher, Arquitecto de Software y CTO, con 
 | Competencia y tendencias de migración médica LatAm | Completo | `docs/research/04-competitive-landscape-and-market-sizing.md` |
 | Beachhead market (recomendación) | Completo — propuesta pendiente de validación del founder | `docs/research/05-beachhead-market-analysis.md` |
 | Cuestionamiento de la propuesta de producto | Completo — propuesta pendiente de validación del founder | `docs/research/06-product-strategy-cuestionamiento.md` |
-| Definición del MVP | Completo (borrador v1, depende de las decisiones anteriores) | `docs/03-mvp-definition.md` |
-| Arquitectura del sistema | Completo (borrador v1) | `docs/04-architecture.md` |
-| Registro de decisiones (ADR) | 6 decisiones documentadas | `docs/decisions/` |
+| Matriz de decisión España vs. Alemania | Completo | `docs/research/07-matriz-beachhead-espana-alemania.md` |
+| Momento crítico del recorrido (input al MVP) | Completo | `docs/research/08-momento-critico-espera.md` |
+| Definición del MVP | **v2 — núcleo: espera de resolución de homologación** | `docs/03-mvp-definition.md` |
+| Arquitectura del sistema | **v2 — núcleo: Radar de Espera (datos agregados anónimos)** | `docs/04-architecture.md` |
+| Recomendación final (6 meses, recursos limitados) | Completo | `docs/09-recomendacion-final-6-meses.md` |
+| Registro de decisiones (ADR) | 8 decisiones documentadas | `docs/decisions/` |
+
+**Decisiones ya validadas por el founder:** ADR-001 (España como beachhead), ADR-002 (núcleo = confianza/navegación, no comparador), ADR-007 (núcleo específico = espera de resolución), ADR-008 (datos agregados anónimos como foso). Pendiente de validación explícita: ADR-003 (monetización adelantada por referidos, ahora diferida a Fase 2 según MVP v2).
 
 ## 7. Preguntas abiertas / riesgos identificados hasta ahora
 
