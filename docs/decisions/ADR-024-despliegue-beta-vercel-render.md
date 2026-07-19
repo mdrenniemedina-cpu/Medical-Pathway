@@ -62,7 +62,7 @@ app.enableCors({
 (mover la llamada después de `const config = app.get(ConfigService)`, o leer `process.env.FRONTEND_ORIGIN` directamente). No se necesita `credentials: true` — no hay cookies involucradas.
 
 ### 4. Vercel — frontend estático
-1. Nuevo proyecto Vercel apuntando al mismo repo, con **Root Directory = `public`** y framework preset "Other" (sin build command, sirve los `.html`/`.css`/`.js` tal cual) — cero configuración adicional, ni `vercel.json`.
+1. **Corregido en el runbook (`docs/29-runbook-despliegue-beta.md` §6) tras verificar la documentación oficial de Vercel:** Root Directory debe quedar en la raíz del repo (default), **no** en `public` — con Root Directory=`public`, el Build Command no podría alcanzar `scripts/generate-frontend-config.js` (vive fuera de esa carpeta). La configuración correcta es Framework Preset "Other", Root Directory por defecto, Build Command `node scripts/generate-frontend-config.js`, Output Directory `public`. Ver el runbook para el paso a paso completo.
 2. **Cambio de código requerido** — `public/app.js:7`, cambiar:
    ```js
    const API_BASE = '/api/v1';
