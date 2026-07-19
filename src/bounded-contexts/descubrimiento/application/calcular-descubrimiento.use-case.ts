@@ -11,7 +11,7 @@ import {
 } from '../domain/descubrimiento.repository.port';
 import { PERFIL_PARA_COMPARAR, PerfilParaCompararPort } from './ports/perfil-para-comparar.port';
 import { DESTINOS_PARA_COMPARAR, DestinosParaCompararPort } from './ports/destinos-para-comparar.port';
-import { ResultadoDescubrimientoView, toResultadoView } from './resultado-view';
+import { DestinoInfo, ResultadoDescubrimientoView, toResultadoView } from './resultado-view';
 
 @Injectable()
 export class CalcularDescubrimientoUseCase {
@@ -35,9 +35,11 @@ export class CalcularDescubrimientoUseCase {
     await this.resultados.guardar(resultado);
 
     const accionesPorDestino = new Map<string, AccionRecomendada[]>();
+    const destinoInfoPorId = new Map<string, DestinoInfo>();
     for (const destino of destinos) {
       accionesPorDestino.set(destino.destinoId, analizarBrechas(perfil, destino, reglasActivas));
+      destinoInfoPorId.set(destino.destinoId, { nombre: destino.nombre });
     }
-    return toResultadoView(resultado, accionesPorDestino);
+    return toResultadoView(resultado, accionesPorDestino, destinoInfoPorId);
   }
 }

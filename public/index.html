@@ -2,56 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Medical Pathway — Sprint 1 (prototipo de validación)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medical Pathway — Tu camino a ejercer medicina en el extranjero</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <h1>Medical Pathway</h1>
-  <p><em>Prototipo del Sprint 1 — construido para validar la propuesta de valor, no para lucir bien.</em></p>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <a class="marca" href="/">Medical Pathway</a>
+      <nav class="nav-enlaces">
+        <a href="/registro.html">Iniciar sesión</a>
+      </nav>
+    </div>
+  </header>
 
-  <h2>Crear cuenta o iniciar sesión</h2>
-  <label>Email</label>
-  <input id="email" type="email" placeholder="tu@email.com" />
-  <label>Contraseña</label>
-  <input id="password" type="password" placeholder="mínimo 8 caracteres" />
-  <button id="btnRegistro">Crear cuenta</button>
-  <button id="btnLogin">Iniciar sesión</button>
-  <p class="error" id="error"></p>
+  <div class="contenedor">
+    <section class="hero">
+      <h1>¿Cuál es el mejor camino para tu carrera médica internacional — y qué te falta para recorrerlo?</h1>
+      <p class="subtitulo">
+        Miles de médicos y estudiantes de Latinoamérica pierden años y dinero navegando homologaciones,
+        exámenes y trámites con información dispersa y, a veces, estafas. Medical Pathway te muestra tu
+        compatibilidad real con cada destino, explicada y trazable a sus fuentes — no un comparador más.
+      </p>
+      <a class="btn btn-primario" href="/registro.html">Comenzar — es gratis</a>
+    </section>
 
-  <script src="/app.js"></script>
-  <script>
-    /**
-     * Tras el registro, el Perfil Internacional se crea de forma asíncrona
-     * (evento de dominio -> outbox -> suscriptor, ver Sprint 0) — no es
-     * instantáneo. Se reintenta brevemente en vez de asumir que ya existe.
-     */
-    async function esperarPerfil(intentos = 10) {
-      for (let i = 0; i < intentos; i++) {
-        try {
-          return await api('/perfil/me');
-        } catch (e) {
-          await new Promise((r) => setTimeout(r, 400));
-        }
-      }
-      throw new Error('Tu perfil está tardando en crearse. Recarga esta página en unos segundos.');
-    }
+    <section class="pilares">
+      <div class="pilar">
+        <div class="pilar-titulo">1. Cuéntanos tu perfil</div>
+        <p>Formación, idiomas y objetivos — una sola vez.</p>
+      </div>
+      <div class="pilar">
+        <div class="pilar-titulo">2. Descubre tu compatibilidad</div>
+        <p>Un porcentaje por destino, con cada razón explicada y su fuente citada.</p>
+      </div>
+      <div class="pilar">
+        <div class="pilar-titulo">3. Sigue un camino claro</div>
+        <p>Qué te falta, qué acciones lo mejoran, y qué sigue.</p>
+      </div>
+    </section>
 
-    async function entrar(path) {
-      document.getElementById('error').textContent = '';
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      try {
-        const data = await api(path, { method: 'POST', body: JSON.stringify({ email, password }) });
-        setToken(data.accessToken);
-        const perfil = await esperarPerfil();
-        setPerfilId(perfil.perfilId);
-        window.location.href = '/onboarding.html';
-      } catch (e) {
-        document.getElementById('error').textContent = e.message;
-      }
-    }
-    document.getElementById('btnRegistro').addEventListener('click', () => entrar('/identidad/registro'));
-    document.getElementById('btnLogin').addEventListener('click', () => entrar('/identidad/login'));
-  </script>
+    <section>
+      <h2>Por qué esto es distinto de buscar en foros o grupos de Facebook</h2>
+      <p>
+        Cada dato que usamos —tiempos, costos, demanda laboral, complejidad regulatoria— tiene una fuente
+        pública verificable y una fecha de verificación visible. No vendemos un curso ni una gestoría:
+        te ayudamos a entender tu propia situación con evidencia, no con opiniones.
+      </p>
+    </section>
+  </div>
+
+  <footer class="pie contenedor">
+    <p>Medical Pathway — información con fines orientativos, no constituye asesoría legal ni migratoria.</p>
+  </footer>
 </body>
 </html>

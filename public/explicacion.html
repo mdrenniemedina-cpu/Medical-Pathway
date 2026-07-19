@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Por qué — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <a class="marca" href="/">Medical Pathway</a>
+      <nav class="nav-enlaces">
+        <a href="/resultados.html">Volver a mi compatibilidad</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="contenedor">
+    <div id="contenido">
+      <div class="cargando"><div class="spinner"></div><span>Cargando la explicación…</span></div>
+    </div>
+  </div>
+
+  <footer class="pie contenedor">
+    <p>Medical Pathway — información con fines orientativos, no constituye asesoría legal ni migratoria.</p>
+  </footer>
+
+  <script src="/app.js"></script>
+  <script>
+    requireAuth();
+    const destinoId = new URLSearchParams(location.search).get('destinoId');
+    let resultadoIdActual = null;
+
+    function claseRazon(aporte) {
+      return aporte < 0 ? 'razon negativo' : 'razon positivo';
+    }
+
+    function render(p) {
+      const razonesHtml = p.razones
+        .map((r) => `<div class="${claseRazon(r.aportePuntos)}">${r.aportePuntos >= 0 ? '+' : ''}${r.aportePuntos} — ${r.explicacionLegible}</div>`)
+        .join('');
+
+      const accionesHtml = p.accionesRecomendadas.length
+        ? p.accionesRecomendadas
+            .map(
+              (a) =>
+                `<div class="accion"><strong>${a.descripcionAccion}</strong><br><small>Impacto estimado: +${a.impactoEstimadoPuntos} puntos (compatibilidad pasaría a ~${a.porcentajeResultanteEstimado}%)</small></div>`,
+            )
+            .join('')
+        : '<p><small>No hay una acción de perfil identificada que mejore esta compatibilidad con las reglas actuales.</small></p>';
+
+      document.getElementById('contenido').innerHTML = `
+        <h1>${p.destinoNombre} — ${p.porcentajeCompatibilidad}% de compatibilidad</h1>
+        <p class="subtitulo">Cada razón está calculada por reglas trazables sobre tu perfil, no por una opinión ni una caja negra.</p>
+
+        <div class="tarjeta">
+          <h2>Por qué este porcentaje</h2>
+          ${razonesHtml}
+        </div>
+
+        <div class="tarjeta">
+          <h2>Qué acciones aumentarían tus oportunidades aquí</h2>
+          ${accionesHtml}
+        </div>
+
+        <div class="tarjeta tarjeta-principal">
+          <h2>¿Listo para seguir este camino?</h2>
+          <button id="btnIniciar" class="btn btn-primario btn-bloque">Iniciar esta ruta</button>
+          <div id="confirmacion"></div>
+        </div>
+
+        <p><a class="enlace-sutil" href="/proyeccion.html?destinoId=${encodeURIComponent(destinoId)}">Ver cómo se vería tu camino en el tiempo (opcional)</a></p>
+      `;
+
+      document.getElementById('btnIniciar').addEventListener('click', async () => {
+        const boton = document.getElementById('btnIniciar');
+        const contenedorConfirmacion = document.getElementById('confirmacion');
+        boton.disabled = true;
+        try {
+          // Dispara DestinoSeleccionado en el dominio, que genera
+          // automáticamente el evento analítico `inicio_de_ruta` en el
+          // backend (ver DominioAAnaliticaSubscriber) — señal de servidor,
+          // no de frontend.
+          await api('/descubrimiento/seleccionar-destino', {
+            method: 'POST',
+            body: JSON.stringify({ resultadoId: resultadoIdActual, destinoId }),
+          });
+          contenedorConfirmacion.innerHTML = `<div class="exito">Ruta iniciada. Pronto podrás seguir tu plan personalizado paso a paso.</div>`;
+        } catch (e) {
+          contenedorConfirmacion.innerHTML = `<div class="error">No se pudo iniciar la ruta: ${e.message}</div>`;
+          boton.disabled = false;
+        }
+      });
+    }
+
+    async function cargar() {
+      try {
+        let resultado = null;
+        const guardado = sessionStorage.getItem('mp_resultado');
+        if (guardado) {
+          resultado = JSON.parse(guardado);
+        }
+        let puntuacion = resultado && resultado.puntuaciones.find((p) => p.destinoId === destinoId);
+        if (!puntuacion) {
+          // El usuario llegó sin pasar por /resultados.html en esta sesión (p. ej. recarga directa) — recalculamos.
+          resultado = await api('/descubrimiento/calcular', { method: 'POST' });
+          sessionStorage.setItem('mp_resultado', JSON.stringify(resultado));
+          puntuacion = resultado.puntuaciones.find((p) => p.destinoId === destinoId);
+        }
+        if (!puntuacion) throw new Error('No encontramos ese destino en tu compatibilidad.');
+
+        resultadoIdActual = resultado.resultadoId;
+        track('destino_explorado', { destinoId, resultadoId: resultadoIdActual });
+        if (puntuacion.accionesRecomendadas.length) {
+          track('acciones_recomendadas_vistas', { destinoId, resultadoId: resultadoIdActual });
+        }
+        render(puntuacion);
+      } catch (e) {
+        document.getElementById('contenido').innerHTML = `<p class="error">${e.message}</p>`;
+      }
+    }
+    cargar();
+  </script>
+</body>
+</html>

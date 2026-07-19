@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crear cuenta — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <a class="marca" href="/">Medical Pathway</a>
+      <nav class="nav-enlaces">
+        <a href="/">Volver al inicio</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="contenedor">
+    <div class="tarjeta tarjeta-principal" style="max-width: 420px; margin: 3rem auto;">
+      <h1 style="margin-top:0; font-size: 1.3rem;">Crea tu cuenta</h1>
+      <p class="subtitulo" style="margin-bottom: 1.25rem;">Un solo paso. Tu perfil internacional se construye después, a tu ritmo.</p>
+
+      <label for="email">Email
+        <span class="ayuda">Lo usamos solo para tu acceso — no enviamos publicidad.</span>
+      </label>
+      <input id="email" type="email" placeholder="tu@email.com" autocomplete="email" />
+
+      <label for="password">Contraseña
+        <span class="ayuda">Mínimo 8 caracteres.</span>
+      </label>
+      <input id="password" type="password" placeholder="••••••••" autocomplete="new-password" />
+
+      <button id="btnRegistro" class="btn btn-primario btn-bloque">Crear cuenta y continuar</button>
+      <button id="btnLogin" class="btn btn-secundario btn-bloque">Ya tengo cuenta — iniciar sesión</button>
+
+      <div id="cargando" class="cargando" style="display:none;">
+        <div class="spinner"></div>
+        <span>Preparando tu perfil…</span>
+      </div>
+      <p class="error" id="error"></p>
+    </div>
+  </div>
+
+  <footer class="pie contenedor">
+    <p>Medical Pathway — información con fines orientativos, no constituye asesoría legal ni migratoria.</p>
+  </footer>
+
+  <script src="/app.js"></script>
+  <script>
+    /**
+     * Tras el registro, el Perfil Internacional se crea de forma asíncrona
+     * (evento de dominio -> outbox -> suscriptor, ver Sprint 0) — no es
+     * instantáneo. Se reintenta brevemente en vez de asumir que ya existe.
+     */
+    async function esperarPerfil(intentos = 10) {
+      for (let i = 0; i < intentos; i++) {
+        try {
+          return await api('/perfil/me');
+        } catch (e) {
+          await new Promise((r) => setTimeout(r, 400));
+        }
+      }
+      throw new Error('Tu perfil está tardando en crearse. Recarga esta página en unos segundos.');
+    }
+
+    async function entrar(path) {
+      document.getElementById('error').textContent = '';
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      document.getElementById('btnRegistro').disabled = true;
+      document.getElementById('btnLogin').disabled = true;
+      document.getElementById('cargando').style.display = 'flex';
+      try {
+        const data = await api(path, { method: 'POST', body: JSON.stringify({ email, password }) });
+        setToken(data.accessToken);
+        const perfil = await esperarPerfil();
+        setPerfilId(perfil.perfilId);
+        window.location.href = '/onboarding.html';
+      } catch (e) {
+        document.getElementById('error').textContent = e.message;
+        document.getElementById('btnRegistro').disabled = false;
+        document.getElementById('btnLogin').disabled = false;
+        document.getElementById('cargando').style.display = 'none';
+      }
+    }
+    document.getElementById('btnRegistro').addEventListener('click', () => entrar('/identidad/registro'));
+    document.getElementById('btnLogin').addEventListener('click', () => entrar('/identidad/login'));
+  </script>
+</body>
+</html>

@@ -2,29 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tu futuro — Medical Pathway</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <nav><a href="/index.html">Inicio</a> <a href="/resultados.html">Volver a resultados</a></nav>
-  <h1>Así se vería tu camino</h1>
-  <p>No es solo una lista de pasos — es una proyección en el tiempo, calculada a partir de datos reales con fuente citada.</p>
-  <div id="proyeccion">Calculando proyección…</div>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <a class="marca" href="/">Medical Pathway</a>
+      <nav class="nav-enlaces">
+        <a href="/resultados.html">Volver a mi compatibilidad</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="contenedor">
+    <h1>Así se vería tu camino</h1>
+    <p class="subtitulo">No es solo una lista de pasos — es una proyección en el tiempo, calculada a partir de datos reales con fuente citada.</p>
+    <div id="proyeccion">
+      <div class="cargando"><div class="spinner"></div><span>Calculando proyección…</span></div>
+    </div>
+  </div>
+
+  <footer class="pie contenedor">
+    <p>Medical Pathway — información con fines orientativos, no constituye asesoría legal ni migratoria.</p>
+  </footer>
 
   <script src="/app.js"></script>
   <script>
     requireAuth();
     const destinoId = new URLSearchParams(location.search).get('destinoId');
 
+    /**
+     * Radar de Espera y Comunidad todavía no tienen ni un solo registro real
+     * (ver docs/26-mvp-beta-auditoria.md y docs/28-respuesta-inversionista-yc.md):
+     * mostrarle a un médico real "esto todavía no existe" durante una entrevista
+     * de descubrimiento daña la confianza que el resto de la interfaz construye.
+     * Se mantiene la instrumentación intacta para poder reactivarlos con un
+     * solo cambio el día que haya algo real detrás.
+     */
+    const MOSTRAR_FAKE_DOORS = false;
+
     function renderEtapa(e) {
       const clases = ['timeline-etapa', e.tipo === 'espera' ? 'espera' : '', e.esOpcional ? 'opcional' : ''].filter(Boolean).join(' ');
       let html = `
         <div class="${clases}">
           <strong>Mes ${e.mesInicioEstimado} – ${e.mesFinEstimado}:</strong> ${e.nombre}${e.esOpcional ? ' (opcional)' : ''}
-          <div class="fuente">Fuente: <a href="${e.fuenteUrl}" target="_blank" rel="noopener">${e.fuenteUrl}</a> · verificado ${e.fechaVerificacion.slice(0, 10)}</div>
+          <div class="fuente">
+            <a class="badge-fuente" href="${e.fuenteUrl}" target="_blank" rel="noopener">Fuente verificada ${e.fechaVerificacion.slice(0, 10)}</a>
+          </div>
         </div>`;
 
-      if (e.tipo === 'espera') {
+      if (e.tipo === 'espera' && MOSTRAR_FAKE_DOORS) {
         html += `
           <div class="fake-door">
             <p><strong>Esta es la etapa más larga e incierta de todo el proceso.</strong></p>
@@ -41,14 +70,19 @@
         track('proyeccion_visualizada', { destinoId, totalMesesEstimado: proyeccion.totalMesesEstimado });
 
         const etapasHtml = proyeccion.etapas.map(renderEtapa).join('');
+        const comunidadHtml = MOSTRAR_FAKE_DOORS
+          ? `<div class="fake-door">
+              <p><strong>¿Quieres hablar con alguien que ya vivió este proceso?</strong></p>
+              <button data-accion="interes-comunidad">Quiero contactar a un médico que ya lo logró</button>
+              <p id="msg-comunidad" style="display:none">Gracias — todavía no existe esta comunidad, pero tu interés queda registrado para priorizarla.</p>
+            </div>`
+          : '';
         document.getElementById('proyeccion').innerHTML = `
-          <p><strong>Duración total estimada:</strong> ${proyeccion.totalMesesEstimadoSinOpcionales} meses (sin contar pasos opcionales) · ${proyeccion.totalMesesEstimado} meses si recorres también los opcionales.</p>
-          ${etapasHtml}
-          <div class="fake-door">
-            <p><strong>¿Quieres hablar con alguien que ya vivió este proceso?</strong></p>
-            <button data-accion="interes-comunidad">Quiero contactar a un médico que ya lo logró</button>
-            <p id="msg-comunidad" style="display:none">Gracias — todavía no existe esta comunidad, pero tu interés queda registrado para priorizarla.</p>
+          <div class="tarjeta">
+            <strong>Duración total estimada:</strong> ${proyeccion.totalMesesEstimadoSinOpcionales} meses (sin contar pasos opcionales) · ${proyeccion.totalMesesEstimado} meses si recorres también los opcionales.
           </div>
+          ${etapasHtml}
+          ${comunidadHtml}
         `;
       } catch (e) {
         document.getElementById('proyeccion').innerHTML = `<p class="error">${e.message}</p>`;

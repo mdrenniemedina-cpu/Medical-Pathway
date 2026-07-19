@@ -1,8 +1,7 @@
 /**
- * Frontend mínimo del Sprint 1 — deliberadamente sin framework ni estilo
- * elaborado (instrucción del founder: "no construyas una interfaz bonita").
- * Su único propósito es validar la propuesta de valor y dejar instrumentado
- * el recorrido completo con eventos analíticos (ver docs/16-hipotesis-sprint-1.md).
+ * Frontend del MVP Beta — sin framework (HTML/CSS/JS plano + docs/27),
+ * pero instrumentado igual que en el Sprint 1: cada paso del recorrido
+ * dispara eventos analíticos reales (ver docs/16-hipotesis-sprint-1.md).
  */
 const API_BASE = '/api/v1';
 
@@ -49,6 +48,6 @@ function track(tipoEvento, propiedades = {}) {
 
 function requireAuth() {
   if (!getToken()) {
-    window.location.href = '/index.html';
+    window.location.href = '/registro.html';
   }
 }

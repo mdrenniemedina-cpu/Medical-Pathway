@@ -2,75 +2,92 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tu perfil internacional — Medical Pathway</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <nav><a href="/index.html">Inicio</a></nav>
-  <h1>Cuéntanos sobre ti</h1>
-  <p>Esto se completa una vez — a partir de aquí, tu recomendación y tu ruta se personalizan (Perfil Internacional).</p>
-  <progress id="progreso" value="1" max="3"></progress>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <a class="marca" href="/">Medical Pathway</a>
+      <nav class="nav-enlaces">
+        <a href="/">Inicio</a>
+      </nav>
+    </div>
+  </header>
 
-  <section id="paso1">
-    <h2>1 de 3 — Tu formación</h2>
-    <label>Universidad</label>
-    <input id="universidad" placeholder="Universidad Nacional de Colombia" />
-    <label>País donde te graduaste (código, ej. CO)</label>
-    <input id="paisGraduacion" placeholder="CO" maxlength="2" />
-    <label>Tipo de título</label>
-    <select id="tipoTitulo">
-      <option value="pregrado">Pregrado (medicina general)</option>
-      <option value="especialidad">Especialidad</option>
-      <option value="subespecialidad">Subespecialidad</option>
-    </select>
-    <button onclick="siguientePaso1()">Siguiente</button>
-  </section>
+  <div class="contenedor">
+    <h1>Cuéntanos sobre ti</h1>
+    <p class="subtitulo">Esto se completa una vez — a partir de aquí, tu compatibilidad y tu ruta se personalizan (tu Perfil Internacional).</p>
+    <progress id="progreso" value="1" max="3"></progress>
 
-  <section id="paso2" style="display:none">
-    <h2>2 de 3 — Idiomas que dominas (además del español)</h2>
-    <label>Idioma</label>
-    <select id="idioma">
-      <option value="">(ninguno adicional)</option>
-      <option value="ingles">Inglés</option>
-      <option value="aleman">Alemán</option>
-      <option value="portugues">Portugués</option>
-      <option value="frances">Francés</option>
-    </select>
-    <label>Nivel</label>
-    <select id="nivelIdioma">
-      <option value="A1">A1</option>
-      <option value="A2">A2</option>
-      <option value="B1">B1</option>
-      <option value="B2">B2</option>
-      <option value="C1">C1</option>
-      <option value="C2">C2</option>
-      <option value="nativo">Nativo</option>
-    </select>
-    <button onclick="siguientePaso2()">Siguiente</button>
-  </section>
+    <div class="tarjeta">
+      <section id="paso1">
+        <h2>1 de 3 — Tu formación</h2>
+        <label for="universidad">Universidad</label>
+        <input id="universidad" placeholder="Universidad Nacional de Colombia" />
+        <label for="paisGraduacion">País donde te graduaste (código, ej. CO)</label>
+        <input id="paisGraduacion" placeholder="CO" maxlength="2" />
+        <label for="tipoTitulo">Tipo de título</label>
+        <select id="tipoTitulo">
+          <option value="pregrado">Pregrado (medicina general)</option>
+          <option value="especialidad">Especialidad</option>
+          <option value="subespecialidad">Subespecialidad</option>
+        </select>
+        <button class="btn btn-primario btn-bloque" onclick="siguientePaso1()">Siguiente</button>
+      </section>
 
-  <section id="paso3" style="display:none">
-    <h2>3 de 3 — Tus objetivos</h2>
-    <label>¿Qué tan urgente es para ti empezar tu carrera internacional?</label>
-    <select id="urgencia">
-      <option value="alta">Alta — quiero avanzar lo antes posible</option>
-      <option value="media">Media</option>
-      <option value="baja">Baja — estoy explorando opciones</option>
-    </select>
-    <label>¿Prefieres una ruta más rápida pero competitiva, o más lenta pero segura?</label>
-    <select id="tolerancia">
-      <option value="prefiere_rapido_competitivo">Rápida y competitiva</option>
-      <option value="prefiere_lento_seguro">Lenta pero segura</option>
-    </select>
-    <label>¿Qué priorizas: ingreso a largo plazo o rapidez para empezar a ejercer?</label>
-    <select id="prioridad">
-      <option value="ingreso_largo_plazo">Ingreso a largo plazo</option>
-      <option value="rapidez_de_practica">Rapidez para ejercer</option>
-    </select>
-    <button onclick="finalizar()">Ver mi recomendación</button>
-  </section>
+      <section id="paso2" style="display:none">
+        <h2>2 de 3 — Idiomas que dominas (además del español)</h2>
+        <label for="idioma">Idioma</label>
+        <select id="idioma">
+          <option value="">(ninguno adicional)</option>
+          <option value="ingles">Inglés</option>
+          <option value="aleman">Alemán</option>
+          <option value="portugues">Portugués</option>
+          <option value="frances">Francés</option>
+        </select>
+        <label for="nivelIdioma">Nivel</label>
+        <select id="nivelIdioma">
+          <option value="A1">A1</option>
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+          <option value="nativo">Nativo</option>
+        </select>
+        <button class="btn btn-primario btn-bloque" onclick="siguientePaso2()">Siguiente</button>
+      </section>
 
-  <p class="error" id="error"></p>
+      <section id="paso3" style="display:none">
+        <h2>3 de 3 — Tus objetivos</h2>
+        <label for="urgencia">¿Qué tan urgente es para ti empezar tu carrera internacional?</label>
+        <select id="urgencia">
+          <option value="alta">Alta — quiero avanzar lo antes posible</option>
+          <option value="media">Media</option>
+          <option value="baja">Baja — estoy explorando opciones</option>
+        </select>
+        <label for="tolerancia">¿Prefieres una ruta más rápida pero competitiva, o más lenta pero segura?</label>
+        <select id="tolerancia">
+          <option value="prefiere_rapido_competitivo">Rápida y competitiva</option>
+          <option value="prefiere_lento_seguro">Lenta pero segura</option>
+        </select>
+        <label for="prioridad">¿Qué priorizas: ingreso a largo plazo o rapidez para empezar a ejercer?</label>
+        <select id="prioridad">
+          <option value="ingreso_largo_plazo">Ingreso a largo plazo</option>
+          <option value="rapidez_de_practica">Rapidez para ejercer</option>
+        </select>
+        <button class="btn btn-primario btn-bloque" onclick="finalizar()">Ver mi compatibilidad</button>
+      </section>
+    </div>
+
+    <p class="error" id="error"></p>
+  </div>
+
+  <footer class="pie contenedor">
+    <p>Medical Pathway — información con fines orientativos, no constituye asesoría legal ni migratoria.</p>
+  </footer>
 
   <script src="/app.js"></script>
   <script>
