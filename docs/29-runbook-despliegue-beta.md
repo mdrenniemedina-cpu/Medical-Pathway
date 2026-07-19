@@ -5,7 +5,7 @@
 ## 0. Commit desplegado
 
 - **Rama:** `claude/startup-from-scratch-abn8o3`
-- **Commit exacto a desplegar:** el HEAD de esa rama en el momento del deploy — verificar con `git rev-parse HEAD` inmediatamente antes de disparar el build en Render/Vercel, y registrar aquí el hash real una vez ejecutado. **No desplegar un commit distinto al que pasó lint/typecheck/build/test/smoke test en este runbook.**
+- **Commit verificado y listo para desplegar:** `8c53404` — pasó lint, `tsc --noEmit`, build, `test:all` (16/16) y smoke test Playwright (13/13) en local. Si la rama recibe commits nuevos antes de ejecutar el deploy, repetir la validación de la sección 5 contra el HEAD real y actualizar este hash antes de desplegar.
 
 ## 1. Cambios de código realizados para este despliegue (ya en el repo, ya validados)
 
