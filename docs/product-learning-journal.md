@@ -12,7 +12,17 @@
 
 ## Quién puede alimentar este documento
 
-Como agente operando en este entorno, no tengo canal propio para reclutar ni entrevistar médicos reales — no tengo acceso a redes sociales, WhatsApp, ni a ninguna base de usuarios. Cada entrada de este journal requiere que el founder (o quien conduzca la entrevista siguiendo `docs/18-discovery-protocolo-entrevistas.md` / `docs/24-discovery-piloto-metodologia.md` / `docs/25-discovery-guion-observacion-mvp.md`) traiga la evidencia cruda — notas, transcripción, grabación transcrita, o al menos las respuestas literales a las preguntas del protocolo — para que yo la analice contra las hipótesis. Sin ese insumo, no hay entrada nueva posible.
+Como agente operando en este entorno, no tengo canal propio para reclutar ni entrevistar médicos reales — no tengo acceso a redes sociales, WhatsApp, ni a ninguna base de usuarios. **Acuerdo operativo vigente desde el 19 de julio de 2026:** el founder conduce personalmente cada entrevista siguiendo `docs/18-discovery-protocolo-entrevistas.md` y la metodología piloto de `docs/24-discovery-piloto-metodologia.md`, y comparte después notas estructuradas, transcripción completa o grabación (con autorización del participante). Yo actúo como **analista de investigación de producto, no como entrevistador**. Para cada entrevista recibida, mi trabajo es:
+
+1. Extraer evidencia objetiva, separada explícitamente de las opiniones (propias o del entrevistado).
+2. Identificar y citar textualmente los pasajes relevantes.
+3. Detectar contradicciones entre lo que el participante dice (Fase A) y lo que hace al interactuar con el MVP (Fase B) — la comparación intra-persona es la evidencia cualitativa más fuerte disponible (ver metodología ya usada en fases anteriores).
+4. Actualizar este journal (nueva entrada + tabla de hipótesis + patrones + prioridades).
+5. Reevaluar **todas** las hipótesis, no solo las que la entrevista tocó directamente — a veces una entrevista debilita una hipótesis por omisión (algo que debería haber aparecido espontáneamente y no apareció).
+6. Detectar patrones emergentes conforme aumente el número de entrevistas — nunca generalizar a partir de una sola.
+7. Recomendar cambios de producto **solo** cuando la evidencia acumulada lo justifique, indicando siempre cuántos participantes respaldan el hallazgo y con qué nivel de confianza (una mención aislada ≠ un patrón).
+
+Sin una entrevista real compartida, no hay entrada nueva posible — nunca se infiere ni se fabrica una.
 
 ---
 
