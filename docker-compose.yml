@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: medical_pathway
+      POSTGRES_PASSWORD: medical_pathway_dev
+      POSTGRES_DB: medical_pathway
+    ports:
+      - "5432:5432"
+    volumes:
+      - medical_pathway_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medical_pathway"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://medical_pathway:medical_pathway_dev@postgres:5432/medical_pathway
+    ports:
+      - "3000:3000"
+
+volumes:
+  medical_pathway_pgdata:

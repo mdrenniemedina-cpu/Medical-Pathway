@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: medical_pathway
+          POSTGRES_PASSWORD: medical_pathway_dev
+          POSTGRES_DB: medical_pathway
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U medical_pathway"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://medical_pathway:medical_pathway_dev@localhost:5432/medical_pathway
+      DATABASE_SSL: 'false'
+      JWT_ACCESS_SECRET: ci-only-secret-not-for-production-use
+      JWT_ACCESS_TTL: 15m
+      JWT_REFRESH_TTL_DAYS: '30'
+      RADAR_K_ANONIMATO_UMBRAL: '5'
+      LOG_LEVEL: info
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Compilar
+        run: npm run build
+
+      - name: Aplicar migraciones (valida que el esquema versionado sea correcto)
+        run: npm run migrate
+
+      - name: Cargar datos semilla mínimos
+        run: npm run seed
+
+      - name: Pruebas unitarias e invariantes de dominio
+        run: npm test
+
+      - name: Pruebas arquitectónicas (límites de bounded context)
+        run: npm run test:arch

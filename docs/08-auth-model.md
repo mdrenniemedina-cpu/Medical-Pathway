@@ -23,7 +23,11 @@ Ver `decisions/ADR-011`. En resumen: una `Cuenta` es "cómo entro" (credenciales
 
 **Importante:** el nivel de verificación del perfil (`ninguno/correo_verificado/titulo_verificado`) es **ortogonal al rol**. Un `usuario` con `titulo_verificado` no gana permisos adicionales de escritura — su verificación afecta el peso de sus datos en el Radar y su elegibilidad para publicar en comunidad, no el modelo RBAC.
 
-## Control de acceso a nivel de fila (Row-Level Security)
+## Nota de Sprint 0: RLS diseñado, activación diferida (ver ADR-020)
+
+Durante la implementación del esqueleto se detectó un conflicto real entre este diseño y el estado actual del código: activar `ENABLE ROW LEVEL SECURITY` con las políticas de abajo **sin** que la aplicación establezca `app.current_perfil_id` en cada transacción **rompería las propias lecturas del servicio** (las políticas devolverían cero filas siempre, incluyendo para el propio backend). Establecer esa variable correctamente con un pool de conexiones compartido requiere que cada operación se ejecute dentro de una transacción con un cliente dedicado (`SET LOCAL`) — una pieza de infraestructura (`withUserContext(perfilId, work)`) que Sprint 0 no construye todavía, siguiendo la instrucción de detenerse y documentar en vez de implementar una versión rota o engañosa. Ver `decisions/ADR-020` para la decisión y el plan de activación.
+
+## Control de acceso a nivel de fila (Row-Level Security) — diseño objetivo (activación en sprint posterior)
 
 Además de la autorización a nivel de aplicación, se activa RLS de Postgres en las tablas más sensibles como segunda capa de defensa (defensa en profundidad):
 
