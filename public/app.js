@@ -3,7 +3,11 @@
  * pero instrumentado igual que en el Sprint 1: cada paso del recorrido
  * dispara eventos analíticos reales (ver docs/16-hipotesis-sprint-1.md).
  */
-const API_BASE = '/api/v1';
+// `window.__API_BASE__` la define public/config.js (generado en build time
+// por scripts/generate-frontend-config.js a partir de API_BASE_URL — ver
+// docs/decisions/ADR-024-despliegue-beta-vercel-render.md). En desarrollo
+// local, config.js no define nada y se usa el fallback relativo de siempre.
+const API_BASE = window.__API_BASE__ || '/api/v1';
 
 function getToken() {
   return localStorage.getItem('mp_access_token');
@@ -51,3 +55,20 @@ function requireAuth() {
     window.location.href = '/registro.html';
   }
 }
+
+/**
+ * Aviso de beta cerrada — visible en toda la app mientras dure esta fase de
+ * aprendizaje (ver instrucción del founder, 2026-07-19). Una sola fuente
+ * (aquí) en vez de duplicar el aviso en cada .html.
+ */
+function renderAvisoBeta() {
+  const aviso = document.createElement('div');
+  aviso.className = 'aviso-beta';
+  aviso.innerHTML =
+    'Estás usando una <strong>versión beta cerrada</strong> de Medical Pathway. ' +
+    'La compatibilidad y las acciones sugeridas son orientativas — no sustituyen la revisión de los requisitos oficiales de cada destino. ' +
+    'Cada fuente y su fecha de verificación pueden consultarse en la explicación de tu resultado. ' +
+    'Por favor, <strong>no introduzcas documentos personales ni información sensible</strong> durante esta fase.';
+  document.body.insertBefore(aviso, document.body.firstChild);
+}
+document.addEventListener('DOMContentLoaded', renderAvisoBeta);

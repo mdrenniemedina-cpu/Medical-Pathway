@@ -1,11 +1,15 @@
 /**
  * Smoke test manual del recorrido completo del MVP Beta, en un navegador
  * real (Chromium headless vía Playwright) — NO es parte de la suite
- * automatizada de CI (requiere un servidor corriendo con datos semilla).
- * Uso: node dist/src/main.js & node scripts/smoke-browser-manual.js
+ * automatizada de CI (requiere un servidor corriendo con datos semilla,
+ * local o desplegado).
+ * Uso local:      node dist/src/main.js & node scripts/smoke-browser-manual.js
+ * Uso desplegado: BASE_URL=https://<beta>.vercel.app node scripts/smoke-browser-manual.js
  *
  * Recorrido: Landing -> Registro -> Perfil Internacional -> Compatibilidad
- * -> Explicación -> Iniciar Ruta -> Proyección (opcional).
+ * -> Explicación -> Iniciar Ruta -> Proyección (opcional), más verificación
+ * de recarga de página, cierre/apertura de sesión, y una pasada en viewport
+ * móvil.
  *
  * Ejecutar este script produce un recorrido REAL de clics; no es lo mismo
  * que "validar con usuarios reales" (ver docs/17-informe-sprint-1.md) — solo
@@ -15,6 +19,8 @@
  */
 const { chromium } = require('playwright');
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   const page = await browser.newPage();
@@ -23,10 +29,14 @@ const { chromium } = require('playwright');
   page.on('console', (msg) => console.log('[browser console]', msg.text()));
   page.on('pageerror', (err) => console.log('[browser error]', err.message));
 
+  console.log(`--- Base URL: ${BASE_URL} ---`);
+
   console.log('--- 1. landing (index.html) ---');
-  await page.goto('http://localhost:3000/index.html');
+  await page.goto(`${BASE_URL}/index.html`);
   await page.waitForSelector('text=Comenzar — es gratis');
   console.log('OK: landing renderizada con CTA principal');
+  const avisoBetaLanding = await page.$('.aviso-beta');
+  console.log(avisoBetaLanding ? 'OK: aviso de beta cerrada visible' : 'FALLO: no se encontró el aviso de beta cerrada');
 
   console.log('--- 2. registro.html: crear cuenta ---');
   await page.click('text=Comenzar — es gratis');
@@ -35,7 +45,7 @@ const { chromium } = require('playwright');
   await page.fill('#password', 'password123');
   await page.click('#btnRegistro');
   await page.waitForURL('**/onboarding.html', { timeout: 15000 });
-  console.log('OK: registrado y redirigido a onboarding');
+  console.log('OK: registrado y redirigido a onboarding (perfil creado vía outbox)');
 
   console.log('--- 3. onboarding: paso 1 (formacion) ---');
   await page.fill('#universidad', 'Universidad Nacional de Colombia');
@@ -87,6 +97,29 @@ const { chromium } = require('playwright');
   console.log('--- 10. fake doors deben permanecer ocultos (MOSTRAR_FAKE_DOORS = false) ---');
   const fakeDoor = await page.$('.fake-door');
   console.log(fakeDoor ? 'FALLO: se encontró un fake door visible en el flujo' : 'OK: ningún fake door visible');
+
+  console.log('--- 11. recarga de página (persistencia de sesión) ---');
+  await page.goto(`${BASE_URL}/resultados.html`);
+  await page.waitForSelector('.tarjeta-principal', { timeout: 15000 });
+  console.log('OK: tras recargar, la sesión persiste y resultados se recalculan sin re-login');
+
+  console.log('--- 12. cierre y nueva apertura de sesión ---');
+  await page.evaluate(() => localStorage.clear());
+  await page.goto(`${BASE_URL}/resultados.html`);
+  await page.waitForURL('**/registro.html', { timeout: 15000 });
+  console.log('OK: sin token, requireAuth() redirige a registro.html (no expone datos de otra sesión)');
+
+  console.log('--- 13. viewport móvil (iPhone SE ~375x667) ---');
+  const mobilePage = await browser.newPage({ viewport: { width: 375, height: 667 } });
+  await mobilePage.goto(`${BASE_URL}/index.html`);
+  await mobilePage.waitForSelector('text=Comenzar — es gratis');
+  const anchoDocumento = await mobilePage.evaluate(() => document.documentElement.scrollWidth);
+  console.log(
+    anchoDocumento <= 375
+      ? 'OK: landing sin desbordamiento horizontal en viewport móvil'
+      : `AVISO: desbordamiento horizontal detectado (scrollWidth=${anchoDocumento}px > 375px)`,
+  );
+  await mobilePage.close();
 
   await browser.close();
   console.log('--- SMOKE TEST COMPLETO SIN ERRORES ---');

@@ -85,3 +85,10 @@ app.enableCors({
 - Se gana: cero cambios de arquitectura de dominio o de mecanismo de eventos; solo dos cambios de código, ambos triviales y reversibles (CORS origin, URL absoluta del API).
 - Se acepta: dos plataformas que gestionar en vez de una; ~$13/mes en vez de un posible tier gratuito de una sola plataforma.
 - **Acción de seguimiento:** ninguna cuenta se crea ni se gasta nada hasta que el founder confirme explícitamente que quiere ejecutar estos pasos.
+
+## Addendum (2026-07-19) — aprobado, en ejecución
+
+El founder aprobó proceder. Dos refinamientos sobre el plan original de esta ADR, implementados en el código antes de desplegar (ver `docs/29-runbook-despliegue-beta.md` para el procedimiento completo):
+
+1. **CORS:** en lugar de una única `FRONTEND_ORIGIN`, se implementó `CORS_ALLOWED_ORIGINS` (lista separada por comas) — el requisito explícito de la beta cerrada es permitir *el dominio de Vercel de la beta y los orígenes locales necesarios para desarrollo*, no solo uno. Sin la variable definida, el default es únicamente `http://localhost:3000` (nunca abierto).
+2. **Alcance ampliado más allá de CORS/URL del API** (bloqueadores reales encontrados al preparar el despliegue, no exceso de alcance): aviso de beta cerrada en la UI, `noindex`/`robots.txt` para que la beta cerrada no se indexe, y parametrización del smoke test (`BASE_URL`) para poder validar contra la URL pública real — los tres eran requisitos explícitos del founder para este mismo despliegue, no funcionalidades nuevas.

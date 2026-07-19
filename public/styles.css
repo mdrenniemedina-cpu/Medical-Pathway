@@ -218,6 +218,18 @@ progress::-webkit-progress-value { background: var(--color-primary); border-radi
 .fuente { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.2rem; }
 .fuente a { color: var(--color-text-muted); }
 
+/* --- Aviso de beta cerrada (docs/product-learning-journal.md, fase de aprendizaje) --- */
+.aviso-beta {
+  background: var(--color-accent-light);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  text-align: center;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.aviso-beta strong { color: var(--color-accent); }
+
 /* --- Footer --- */
 .pie {
   margin-top: 3rem;
