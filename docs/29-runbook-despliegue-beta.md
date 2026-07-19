@@ -35,7 +35,26 @@ Todos estos cambios pasaron `lint`, `tsc --noEmit`, `build`, `test`, `test:arch`
 4. Variables de entorno del Web Service (nombres — valores nunca se documentan aquí):
    - `DATABASE_URL`, `DATABASE_SSL=true`, `JWT_ACCESS_SECRET` (generar uno nuevo, nunca reusar el de `.env` local), `JWT_ACCESS_TTL`, `JWT_REFRESH_TTL_DAYS`, `CORS_ALLOWED_ORIGINS` (URL de Vercel del paso 2.2, una vez exista — puede completarse después y redeployar), `NODE_ENV=production`, `RADAR_K_ANONIMATO_UMBRAL`, `LOG_LEVEL=info`.
 
-**DETENTE AQUÍ y confirma conmigo antes de crear la cuenta de Render o seleccionar cualquier plan con costo.**
+### 2.1.bis Justificación de cada decisión de Render (pedida explícitamente antes de confirmar cualquier plan de pago)
+
+**Región — recomendación: Ohio (US East) o Virginia, la misma para Postgres y Web Service.**
+- Render no tiene región en Sudamérica; entre las disponibles (Oregon, Ohio, Virginia, Frankfurt, Singapur), Ohio/Virginia (costa este de EE.UU.) tienen menor latencia de red hacia Latinoamérica que Frankfurt o Singapur — relevante porque las entrevistas son sesiones en vivo con el founder observando la pantalla del participante, no tráfico batch.
+- El precio de Render **no varía por región** para el mismo tipo de instancia — esta decisión es puramente de latencia, no de costo.
+- **Regla dura, no opcional:** Postgres y Web Service deben quedar en la **misma región** — si no, Render obliga a usar la External Database URL (sale a internet público) en vez de la Internal Database URL (red privada interna, más rápida y sin exponer la base a internet). Elegir regiones distintas sería un error de configuración, no una alternativa válida.
+
+**Plan de Postgres — recomendación: Starter (~$6/mes), no el free tier.**
+- El free tier de Render Postgres expira a los 30 días (con 14 días de gracia) y luego se **borra**. El piloto (3-5 entrevistas) más el estudio principal (10-15) pueden fácilmente superar 30 días de calendario — perder la base de datos a mitad del estudio sería mucho más costoso que $6/mes.
+- Para 5-10 usuarios de beta, el volumen de datos es trivial (decenas de filas de cuentas/perfiles/resultados + el catálogo semilla) — Starter (el nivel pago más bajo) sobra por un margen enorme. No hay ninguna razón de rendimiento para pagar un nivel superior en esta fase.
+- **Alternativa más barata real:** ninguna, dado el requisito de "no perder datos a mitad del estudio". El free tier sería la opción de $0 pero con ese riesgo concreto — se descarta.
+
+**Plan de Web Service — recomendación: Starter (~$7/mes), no el free tier.**
+- Render sí ofrece un Web Service gratuito, pero **se "duerme" tras un período de inactividad** y tarda decenas de segundos en despertar (cold start) con la primera petición. En una entrevista supervisada en vivo, eso se vería como "la aplicación no funciona" en el peor momento posible — justo cuando el médico está mirando la pantalla. Este es el motivo concreto (no genérico) para pagar Starter en lugar de usar el free tier.
+- Starter (512 MB RAM, CPU compartida) es más que suficiente para 5-10 usuarios con uso supervisado, no simultáneo masivo — no hay necesidad de un plan superior ni de autoescalado en esta fase.
+- **Alternativa más barata real:** el free tier ahorraría ~$7/mes, pero reintroduce el riesgo de cold-start justo durante las entrevistas — se descarta por el objetivo explícito de esta beta (evidencia limpia, sin fricción técnica que contamine la percepción del producto).
+
+**Costo total confirmado con estas decisiones: ~$13/mes** (Postgres Starter ~$6 + Web Service Starter ~$7), sin Vercel (Hobby, $0 para este alcance).
+
+**DETENTE AQUÍ y confirma conmigo la región y los dos planes (Postgres Starter, Web Service Starter) antes de crear la cuenta de Render o seleccionar cualquier plan con costo.**
 
 ### 2.2 Vercel (gratuito para este alcance — Hobby)
 1. Crear cuenta en Vercel (o autorizar acceso a GitHub, mismo repo).
