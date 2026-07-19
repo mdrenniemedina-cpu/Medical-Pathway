@@ -50,12 +50,12 @@ Actuando como Product Manager, UX Researcher, Arquitecto de Software y CTO, con 
 | Cuestionamiento de la propuesta de producto | Completo — propuesta pendiente de validación del founder | `docs/research/06-product-strategy-cuestionamiento.md` |
 | Matriz de decisión España vs. Alemania | Completo | `docs/research/07-matriz-beachhead-espana-alemania.md` |
 | Momento crítico del recorrido (input al MVP) | Completo | `docs/research/08-momento-critico-espera.md` |
-| Definición del MVP | **v2 — núcleo: espera de resolución de homologación** | `docs/03-mvp-definition.md` |
-| Arquitectura del sistema | **v2 — núcleo: Radar de Espera (datos agregados anónimos)** | `docs/04-architecture.md` |
+| Definición del MVP | **v3 — recorrido completo de 5 etapas, Radar de Espera anidado en España** | `docs/03-mvp-definition.md` |
+| Arquitectura del sistema | **v3 — motor de descubrimiento/comparación + roadmap + Radar de Espera anidado** | `docs/04-architecture.md` |
 | Recomendación final (6 meses, recursos limitados) | Completo | `docs/09-recomendacion-final-6-meses.md` |
-| Registro de decisiones (ADR) | 8 decisiones documentadas | `docs/decisions/` |
+| Registro de decisiones (ADR) | 9 decisiones documentadas | `docs/decisions/` |
 
-**Decisiones ya validadas por el founder:** ADR-001 (España como beachhead), ADR-002 (núcleo = confianza/navegación, no comparador), ADR-007 (núcleo específico = espera de resolución), ADR-008 (datos agregados anónimos como foso). Pendiente de validación explícita: ADR-003 (monetización adelantada por referidos, ahora diferida a Fase 2 según MVP v2).
+**Decisiones ya validadas por el founder:** ADR-001 (España como beachhead), ADR-002 (núcleo = confianza/navegación, no comparador — refinado por ADR-009), ADR-007 (Radar de Espera como funcionalidad diferenciadora, alcance corregido por ADR-009), ADR-008 (datos agregados anónimos como foso), ADR-009 (el producto es el recorrido completo de 5 etapas; Radar de Espera anidado, no reemplaza la visión). Pendiente de validación explícita: ADR-003 (monetización adelantada por referidos, diferida a Fase 2).
 
 ## 7. Preguntas abiertas / riesgos identificados hasta ahora
 

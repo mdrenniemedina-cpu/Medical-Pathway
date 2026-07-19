@@ -2,7 +2,9 @@
 
 > Diseñada para el alcance definido en `03-mvp-definition.md`. Prioriza velocidad de iteración y bajo coste operativo sobre escalabilidad prematura — coherente con la etapa (pre-PMF) del proyecto. Cada decisión relevante tiene su ADR en `decisions/`.
 >
-> **Changelog v2:** tras identificar la espera de resolución de homologación como el momento de mayor dolor (`research/08-momento-critico-espera.md`), el componente de mayor prioridad de construcción deja de ser el rastreador de roadmap genérico y pasa a ser el **motor de agregación anónima de tiempos de espera** ("Radar de Espera"). El resto de la arquitectura (monolito modular, stack, seguridad) se mantiene; lo que cambia es qué módulo se construye primero y con más profundidad. Ver `decisions/ADR-007` y `decisions/ADR-008`.
+> **Changelog v2:** tras identificar la espera de resolución de homologación como el momento de mayor dolor (`research/08-momento-critico-espera.md`), el componente de mayor prioridad de construcción deja de ser el rastreador de roadmap genérico y pasa a ser el **motor de agregación anónima de tiempos de espera** ("Radar de Espera"). Ver `decisions/ADR-007` y `decisions/ADR-008`.
+>
+> **Changelog v3:** el founder corrigió el alcance — el producto es el recorrido completo del médico (descubrir → comparar → planificar → acompañar), y el Radar de Espera se **anida** dentro de la etapa de acompañamiento como su funcionalidad diferenciadora, no como el producto entero. Se revive el motor de descubrimiento/comparación personalizada y el plan paso a paso (presentes en v1, retirados en v2), ahora con la disciplina de profundidad asimétrica por destino que v2 introdujo. Ver `decisions/ADR-009`.
 
 ## 1. Principios de diseño
 
@@ -12,40 +14,57 @@
 4. **Privacidad y datos sensibles por diseño.** El gestor documental maneja pasaportes, títulos y datos profesionales — cifrado en reposo, control de acceso estricto, cumplimiento GDPR (usuarios que interactúan con autoridades españolas/UE) y normativas de protección de datos LatAm (ADR-003).
 5. **Instrumentación desde el día uno.** Las métricas de éxito del MVP (retención, conversión, distribución de origen) son la forma de confirmar o refutar las hipótesis estratégicas documentadas — no son un "nice to have" posterior.
 
-## 2. Componentes del sistema (MVP v2)
+## 2. El recorrido de 5 etapas (marco de producto)
+
+| Etapa | Pregunta que responde | Alcance (los 9 destinos) | Alcance (España) |
+|---|---|---|---|
+| 1. Descubrimiento | "¿A dónde puedo ir?" | Motor de coincidencia transparente sobre datos ya investigados (radar) | Igual, sin trato especial |
+| 2. Comparación personalizada | "¿Cuál me conviene más entre mis opciones?" | Comparación en profundidad del shortlist con explicación de cada recomendación | Igual, sin trato especial |
+| 3. Plan paso a paso | "¿Qué tengo que hacer, y en qué orden?" | Roadmap genérico/ligero por destino (a partir del contenido ya investigado en `research/01-03`) | Roadmap profundo con checklist accionable |
+| 4. Acompañamiento | "¿Cómo llevo esto sin perderme ni ser estafado?" | Comunidad y alertas genéricas | Comunidad, checklist y gestor documental activos |
+| 5. Radar de Espera *(anidado en la etapa 4)* | "¿Cuánto voy a esperar, realmente?" | Solo disponible donde exista un paso de espera modelado (ninguno más en el MVP) | Activo — anidado en el paso de homologación |
+
+La etapa 5 no es una etapa separada del recorrido del usuario: es una funcionalidad que aparece **dentro** del paso de homologación de la etapa 4, cuando el usuario llega ahí. Se modela de forma genérica (ligada a cualquier `PathwayStep`, no solo a España) para poder activarse en el futuro sobre otros pasos de espera conocidos (p. ej. la cita del Kenntnisprüfung en Alemania, la verificación de fuente en Canadá) sin rediseño, aunque en el MVP solo se puebla de contenido y lógica para España.
+
+## 3. Componentes del sistema (MVP v3)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Cliente web (responsive)                                    │
-│  Next.js / React — SSR para SEO del "radar de destinos"      │
+│  Next.js / React — SSR para SEO de descubrimiento/comparación│
 └───────────────────────────┬───────────────────────────────────┘
                             │ HTTPS / REST o tRPC
 ┌───────────────────────────▼───────────────────────────────────┐
 │  Backend modular monolito (Node.js/TypeScript, p.ej. NestJS)  │
 │                                                                │
+│  ┌──────────────┐ ┌───────────────────────┐ ┌───────────────┐│
+│  │ Perfiles/Auth │ │ Motor de Descubrimiento│ │ Comparación   ││
+│  │ (onboarding   │ │ (matching transparente │ │ personalizada ││
+│  │ enriquecido:  │ │ perfil × destino,      │ │ (shortlist +  ││
+│  │ idiomas,      │ │ explicable, no IA de   │ │ explicación   ││
+│  │ presupuesto,  │ │ caja negra)            │ │ "por qué")    ││
+│  │ urgencia,     │ └───────────────────────┘ └───────────────┘│
+│  │ tolerancia a  │ ┌───────────────────────────────────────┐  │
+│  │ riesgo)       │ │ Contenido/CMS (radar de 9 destinos +   │  │
+│  └──────────────┘ │ roadmaps por destino, fuente/fecha)     │  │
+│                    └───────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ Rastreador de rutas (Pathway/PathwayStep genérico;      │   │
+│  │ profundo + checklist accionable solo para España)       │   │
+│  └──────────────────────────────────────────────────────┘   │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │ ★ NÚCLEO: Radar de Espera                              │  │
-│  │ (registro de expedientes, agregación anónima con       │  │
-│  │  umbral k-anonimato, estimaciones por ventana de envío  │  │
-│  │  y comunidad autónoma) — máxima prioridad de build      │  │
+│  │ ★ Radar de Espera (anidado en el PathwayStep de          │  │
+│  │  homologación de España): registro de expedientes,      │  │
+│  │  agregación anónima con umbral k-anonimato, estimaciones │  │
+│  │  por ventana de envío y comunidad autónoma               │  │
 │  └───────────────────────────────────────────────────────┘  │
 │  ┌──────────────┐ ┌───────────────┐ ┌───────────────────────┐│
-│  │ Perfiles/Auth │ │ Contenido/CMS │ │ Checklist pre-envío   ││
-│  │ (onboarding,  │ │ (radar de 9   │ │ (reduce riesgo de     ││
-│  │ verificación  │ │ destinos +    │ │ subsanación, alertas  ││
-│  │ ligera)       │ │ contexto      │ │ anti-estafa           ││
-│  │               │ │ editorial)    │ │ contextuales)         ││
+│  │ Comunidad     │ │ Gestor        │ │ Notificaciones +       ││
+│  │ (segmentada,  │ │ documental    │ │ Analítica (embudo      ││
+│  │ moderada,     │ │ mínimo +      │ │ completo: descubrimiento│
+│  │ anti-estafa)  │ │ directorio    │ │ → comparación → plan →││
+│  │               │ │ anti-estafa   │ │ acompañamiento → espera)││
 │  └──────────────┘ └───────────────┘ └───────────────────────┘│
-│  ┌──────────────┐ ┌───────────────────────────────────────┐  │
-│  │ Comunidad     │ │ Notificaciones + Analítica (retención, │  │
-│  │ (segmentada   │ │ volumen de datos agregados,            │  │
-│  │ por ventana   │ │ distribución de origen)                │  │
-│  │ de envío)     │ │                                         │  │
-│  └──────────────┘ └───────────────────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │ Gestor documental mínimo + directorio anti-estafa      │   │
-│  │ (alcance reducido en v2 — ver 03-mvp-definition.md)     │   │
-│  └──────────────────────────────────────────────────────┘   │
 └───────────────────────────┬───────────────────────────────────┘
                             │
 ┌───────────────────────────▼───────────────────────────────────┐
@@ -56,22 +75,27 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-El "Radar de Espera" es, en esta versión, el módulo que se construye primero y con mayor cuidado — es el activo de datos que constituye el foso defendible del producto (ver ADR-008). Los demás módulos existen para sostenerlo (checklist reduce ruido en los datos al minimizar subsanaciones; comunidad y alertas anti-estafa dan valor inmediato mientras se acumula suficiente dato agregado para que las estimaciones sean útiles).
+**Por qué esto no diluye la disciplina de foco de v2:** el Motor de Descubrimiento y la Comparación reutilizan el mismo dataset del radar (ya investigado, con fuente y fecha) — no es contenido nuevo ni superficial, es una capa de personalización sobre datos ya sólidos. El Roadmap "ligero" de los otros 8 destinos también reutiliza directamente el contenido ya producido en `research/01-03` (los pasos de cada país ya están documentados) — no requiere nueva investigación, solo estructurarlo en el modelo de contenido. La única inversión de ingeniería genuinamente nueva y no trivial sigue siendo el Radar de Espera (motor de agregación con privacidad) — que se mantiene como la funcionalidad de mayor cuidado, ahora correctamente posicionada dentro del recorrido en lugar de ser todo el recorrido.
 
-## 3. Modelo de datos (alto nivel)
+**Motor de Descubrimiento — cómo funciona (importante: no es un modelo de IA):** es una función de puntuación determinista y explicable sobre atributos ya conocidos de cada destino (barrera de idioma, tiempo, coste, demanda, dificultad, complejidad regulatoria) frente a atributos del perfil del usuario (idiomas que domina, presupuesto, urgencia, tolerancia a examen competitivo vs. ruta más lenta pero segura, prioridad entre ingreso a largo plazo y rapidez de práctica). El resultado siempre se muestra con la razón ("te recomendamos España porque no hay barrera de idioma y tu presupuesto es limitado; Alemania aparece como alternativa a considerar si priorizas ingreso a largo plazo pese a la barrera de idioma"). Esto es deliberadamente distinto de un motor de IA de recomendación: sigue siendo válida la decisión de no usar IA para esto (ver `decisions/ADR-002`) porque un sistema de reglas transparente no tiene el riesgo de "autoridad falsa" que sí tiene un modelo opaco entrenado sin suficiente contenido verificado por destino.
 
-- **User / Profile:** datos de onboarding, país de origen, destino(s) de interés, nivel de verificación (ninguno/correo profesional/título cargado), rol (usuario/mentor/moderador/editor de contenido/admin).
-- **SubmissionRecord (núcleo del Radar de Espera):** fecha de envío, tipo de expediente/especialidad, comunidad autónoma, fecha de resolución (si ya ocurrió) y resultado. Vinculado al usuario para permitirle ver/editar su propio dato, pero **nunca expuesto individualmente a otros usuarios** — solo alimenta agregados.
-- **WaitTimeAggregate:** vista/tabla derivada de `SubmissionRecord`, agrupada por ventana de envío + comunidad autónoma, recalculada periódicamente. Solo se publica una estimación si el grupo supera un umbral mínimo de registros (k-anonimato, ver ADR-008) — evita poder inferir el dato de un individuo concreto.
-- **Destination:** uno por país (9 en catálogo), con metadatos del radar (tiempo, coste, idioma, demanda, dificultad) — cada campo con `source_url` y `verified_at`.
-- **PreSubmissionChecklistItem / UserChecklistProgress:** checklist de preparación pre-envío y su estado por usuario — su función es reducir subsanaciones, no ser un gestor documental completo.
-- **Document (alcance mínimo en v2):** solo lo necesario para la checklist pre-envío, cifrado, con fecha de vencimiento si aplica.
-- **CommunityThread / CommunityReply:** segmentado por ventana de envío del usuario; con flags de moderación y de "estafa reportada" (alimenta la métrica de estafas bloqueadas).
+## 4. Modelo de datos (alto nivel)
+
+- **User / Profile:** datos de onboarding **enriquecidos para el motor de descubrimiento** — país de origen, especialidad, años de experiencia, idiomas que domina (además de español), presupuesto aproximado, urgencia/tiempo disponible, tolerancia a examen competitivo vs. ruta más lenta pero segura, prioridad entre ingreso a largo plazo y rapidez de práctica, destino(s) de interés explícito si ya los tiene, nivel de verificación, rol.
+- **Destination:** uno por país (9 en catálogo), con metadatos del radar (tiempo, coste, idioma, demanda, dificultad, complejidad regulatoria) — cada campo con `source_url` y `verified_at`. Es la base de datos que alimenta tanto el Motor de Descubrimiento como la Comparación personalizada.
+- **DestinationMatchRule:** reglas de puntuación/peso que relacionan atributos de `Profile` con atributos de `Destination` (p. ej. "si idioma_alemán = ninguno, penalizar Alemania/Suiza") — versionadas y editables por el equipo de producto, no un modelo entrenado; permite mostrar siempre la razón de cada recomendación (requisito de transparencia, ver `decisions/ADR-005`).
+- **Pathway / PathwayStep:** uno por destino; España tiene pasos profundos con checklist accionable (apostilla → traducción → homologación → colegiación → [MIR opcional]); los otros 8 destinos tienen pasos a nivel de resumen, generados a partir del contenido ya investigado en `research/01-03`, sin checklist accionable todavía.
+- **UserPathwayProgress:** estado del usuario en cada paso de su destino elegido (pendiente/en curso/hecho).
+- **SubmissionRecord (núcleo del Radar de Espera, anidado en un `PathwayStep`):** fecha de envío, tipo de expediente/especialidad, comunidad autónoma, fecha de resolución (si ya ocurrió) y resultado. Vinculado al usuario para permitirle ver/editar su propio dato, pero **nunca expuesto individualmente a otros usuarios** — solo alimenta agregados. Modelado con referencia genérica a `pathway_step_id` (no hardcoded a España) para poder activarse sobre otros pasos de espera en el futuro sin rediseño.
+- **WaitTimeAggregate:** vista/tabla derivada de `SubmissionRecord`, agrupada por ventana de envío + comunidad autónoma, recalculada periódicamente. Solo se publica una estimación si el grupo supera un umbral mínimo de registros (k-anonimato, ver `decisions/ADR-008`).
+- **PreSubmissionChecklistItem / UserChecklistProgress:** checklist de preparación pre-envío (España) y su estado por usuario — reduce subsanaciones.
+- **Document (alcance mínimo):** solo lo necesario para la checklist pre-envío, cifrado, con fecha de vencimiento si aplica.
+- **CommunityThread / CommunityReply:** segmentado por destino elegido y, para España, por ventana de envío; con flags de moderación y de "estafa reportada".
 - **ScamAlert (contenido editorial):** alertas contextuales mostradas durante la fase de espera, versionadas con fuente.
-- **Provider (directorio, alcance reducido en v2):** solo para función anti-estafa (proveedores verificados vs. reportados como fraudulentos); el catálogo extenso de monetización por referidos se difiere a Fase 2.
-- **Event (analítica):** eventos de producto (registro de expediente, consulta de estimación, uso recurrente durante la espera, paso de checklist marcado) — la señal más importante ahora es la recurrencia de consulta durante la espera, no solo el onboarding.
+- **Provider (directorio, alcance reducido):** solo para función anti-estafa (proveedores verificados vs. reportados como fraudulentos); el catálogo extenso de monetización por referidos se difiere a Fase 2.
+- **Event (analítica):** eventos de producto a lo largo de **todo el embudo** — onboarding/perfil completado, resultado de descubrimiento visto, comparación consultada, destino elegido, paso de plan marcado, registro de expediente, consulta de estimación de espera — permite medir en qué etapa se pierden usuarios, no solo la retención dentro de una sola etapa.
 
-## 4. Seguridad y privacidad
+## 5. Seguridad y privacidad
 
 - Cifrado en tránsito (TLS) y en reposo (documentos y campos sensibles del perfil).
 - Verificación de identidad profesional es **ligera** en el MVP (correo profesional o carga de título revisada por moderador humano) — no se construye un sistema de verificación de credenciales automatizado en esta fase (coste/complejidad no justificados todavía).
@@ -80,7 +104,7 @@ El "Radar de Espera" es, en esta versión, el módulo que se construye primero y
 - Todo contenido informativo lleva disclaimer visible: "información con fines orientativos, no constituye asesoría legal ni migratoria" (mitigación de riesgo legal, ver `research/06-product-strategy-cuestionamiento.md`).
 - **Umbral de k-anonimato para el Radar de Espera:** ninguna estimación agregada (`WaitTimeAggregate`) se publica si el grupo subyacente (ventana de envío + comunidad autónoma) tiene menos de un número mínimo de registros (a definir, p. ej. 5-10) — evita que un grupo pequeño permita inferir el dato individual de un usuario concreto. Este es el control de privacidad más crítico del producto, porque el activo de datos central depende de que los usuarios confíen en que su información individual nunca se expone (ver ADR-008).
 
-## 5. Stack propuesto (MVP)
+## 6. Stack propuesto (MVP)
 
 | Capa | Elección | Razón |
 |---|---|---|
@@ -92,12 +116,12 @@ El "Radar de Espera" es, en esta versión, el módulo que se construye primero y
 | Notificaciones | Cola de trabajos (p. ej. BullMQ sobre Redis) + email transaccional | Alertas de cambios regulatorios y vencimientos de documentos no son tiempo-crítico, encolar es suficiente |
 | Hosting | Plataforma gestionada (p. ej. Render/Fly.io) sobre contenedores Docker | Minimiza carga operativa antes de PMF; portable a AWS/GCP si el volumen lo justifica |
 
-## 6. Qué se difiere explícitamente (y por qué no es deuda técnica, es alcance)
+## 7. Qué se difiere explícitamente (y por qué no es deuda técnica, es alcance)
 
 - **Microservicios:** innecesarios al tamaño actual; el modular monolito ya define los límites de dominio para extraer servicios cuando (si) haga falta.
-- **Scraping/IA automatizada de contenido regulatorio:** riesgo legal y de calidad demasiado alto para el MVP; el contenido se mantiene editorialmente.
+- **Scraping/IA automatizada de contenido regulatorio, y cualquier motor de recomendación basado en modelos entrenados (no reglas transparentes):** riesgo legal y de calidad demasiado alto para el MVP; el contenido y el matching se mantienen editoriales/basados en reglas explicables.
 - **Verificación de identidad profesional fuerte (KYC médico):** se aborda si la comunidad crece lo suficiente para que la verificación ligera actual deje de ser suficiente.
-- **Internacionalización de contenido profundo a los otros 8 destinos:** condicionado a validar retención en España primero (ver criterio de salida del MVP).
+- **Roadmap profundo + checklist accionable + Radar de Espera para los otros 8 destinos:** condicionado a validar retención y volumen de datos en España primero (ver criterio de salida del MVP). El descubrimiento y la comparación sí cubren los 9 destinos desde el MVP — lo que se difiere es la profundidad de ejecución, no la cobertura de decisión.
 
 ## Historial de decisiones
 
