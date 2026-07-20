@@ -78,8 +78,9 @@ El free tier de Render se "duerme" tras inactividad (cold start de decenas de se
    - **Region:** **la misma que elegiste para Postgres** (Ohio o Virginia) — obligatorio, no opcional.
    - **Branch:** `claude/startup-from-scratch-abn8o3`.
    - **Root Directory:** **déjalo en blanco** (el `package.json` está en la raíz del repo).
-   - **Runtime:** debería auto-detectar **Node** — no lo cambies.
-   - **Build Command:** `npm ci && npm run build`
+   - **Language:** Render puede autodetectar **"Docker"** porque el repo tiene un `Dockerfile` — **cámbialo a "Node"**. No usar Docker aquí: la etapa final del `Dockerfile` corre `npm install --omit=dev`, y `ts-node`/`typescript` (necesarios para el Pre-Deploy Command) son `devDependencies` — quedarían excluidos de esa imagen y las migraciones fallarían. El Dockerfile no se toca (sigue sirviendo para build/CI local); simplemente no se usa para este Web Service.
+   - **Build Command:** `npm ci --include=dev && npm run build`
+     **Importante — no uses `npm ci && npm run build` a secas (error real encontrado en el primer intento de despliegue):** con la variable `NODE_ENV=production` ya configurada (ver más abajo), `npm ci` por defecto instala solo dependencias de producción y omite `typescript`/`ts-node`/`tsc-alias` — el build falla con errores `TS5090`/`TS5102`/`TS5108` porque, al no encontrar `tsc` localmente, se resuelve una versión de TypeScript mucho más nueva que ya no acepta las opciones del `tsconfig` del proyecto. `--include=dev` fuerza la instalación completa sin importar `NODE_ENV`.
    - **Start Command:** `npm run start`
    - **Instance Type / Plan:** **Starter** (~$7/mes). No Free.
 4. Click en **"Advanced"** para desplegar las opciones avanzadas (todavía no hagas click en crear el servicio):
@@ -144,7 +145,9 @@ El free tier de Render se "duerme" tras inactividad (cold start de decenas de se
    `https://medical-pathway-xxxx.vercel.app,http://localhost:3000`
    (coma-separado — así dejas también tu `localhost:3000` para seguir probando en local sin bloquear CORS).
 3. Guarda — Render redeploya automáticamente con la nueva variable (no hace falta tocar código ni el Pre-Deploy Command otra vez).
-4. Avísame cuando el redeploy termine ("Live" de nuevo) — desde aquí yo puedo hacer las verificaciones automatizadas (curl al health check, smoke test de Playwright) que sí alcanzo a ejecutar contra una URL pública, sin necesitar acceso a ninguna de las dos cuentas.
+4. Avísame cuando el redeploy termine ("Live" de nuevo).
+
+**Corrección importante (descubierta durante el despliegue real):** el entorno donde corre esta sesión de IA tiene salida a internet restringida por una política de red — solo alcanza dominios específicos permitidos (npm, GitHub, Anthropic, etc.), no dominios arbitrarios como `*.onrender.com` o `*.vercel.app`. Verificado con dos herramientas distintas (curl directo y fetch web), ambas devuelven `403` de la política, no un error del despliegue. **Esto significa que las verificaciones automatizadas (curl al health check, smoke test de Playwright contra la URL pública) NO se pueden ejecutar desde esta sesión** — el checklist de la sección 8 se hace con el navegador del founder, guiado paso a paso, igual que el resto de este runbook. Si en el futuro esta sesión corre en un entorno con salida a internet sin restricciones, esas verificaciones sí podrían automatizarse.
 
 ## 8. Verificación conjunta (la hacemos juntos tras la Fase 4)
 
