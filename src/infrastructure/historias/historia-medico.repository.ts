@@ -17,6 +17,65 @@ export interface RegistrarHistoriaMedicoParams {
   completado: boolean;
 }
 
+export interface HistoriaMedicoRow {
+  id: string;
+  etapa_formacion: string;
+  ha_imaginado_ejercer_otro_pais: boolean;
+  serio_interes: string | null;
+  paises_interes: string | null;
+  que_te_ha_frenado: string | null;
+  incertidumbre: string | null;
+  frustracion_busqueda: string | null;
+  que_haria_valer_la_pena: string | null;
+  consideraria_pagar: string | null;
+  precio_justo: string | null;
+  completado: boolean;
+  creado_en: Date;
+}
+
+export interface FiltrosHistorias {
+  etapaFormacion?: string;
+  serioInteres?: string;
+  paisesInteres?: string;
+  consideraPagar?: string;
+  buscar?: string; // busca dentro de las 4 respuestas abiertas
+}
+
+/** Arma la cláusula WHERE + parámetros de forma segura (parametrizada, nunca concatenación directa). */
+function armarFiltro(filtros: FiltrosHistorias): { clausula: string; valores: unknown[] } {
+  const condiciones: string[] = [];
+  const valores: unknown[] = [];
+
+  if (filtros.etapaFormacion) {
+    valores.push(filtros.etapaFormacion);
+    condiciones.push(`etapa_formacion = $${valores.length}`);
+  }
+  if (filtros.serioInteres) {
+    valores.push(filtros.serioInteres);
+    condiciones.push(`serio_interes = $${valores.length}`);
+  }
+  if (filtros.consideraPagar) {
+    valores.push(filtros.consideraPagar);
+    condiciones.push(`consideraria_pagar = $${valores.length}`);
+  }
+  if (filtros.paisesInteres) {
+    valores.push(`%${filtros.paisesInteres}%`);
+    condiciones.push(`paises_interes ILIKE $${valores.length}`);
+  }
+  if (filtros.buscar) {
+    valores.push(`%${filtros.buscar}%`);
+    const posicion = valores.length;
+    condiciones.push(
+      `(que_te_ha_frenado ILIKE $${posicion} OR incertidumbre ILIKE $${posicion} OR frustracion_busqueda ILIKE $${posicion} OR que_haria_valer_la_pena ILIKE $${posicion})`,
+    );
+  }
+
+  return {
+    clausula: condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : '',
+    valores,
+  };
+}
+
 @Injectable()
 export class HistoriaMedicoRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
@@ -43,5 +102,20 @@ export class HistoriaMedicoRepository {
         params.completado,
       ],
     );
+  }
+
+  /** Usado por el panel de administración (listado + filtros); ver AdminBasicAuthGuard. */
+  async listar(filtros: FiltrosHistorias): Promise<HistoriaMedicoRow[]> {
+    const { clausula, valores } = armarFiltro(filtros);
+    const { rows } = await this.pool.query<HistoriaMedicoRow>(
+      `SELECT * FROM historias.historia_medico ${clausula} ORDER BY creado_en DESC`,
+      valores,
+    );
+    return rows;
+  }
+
+  async contarTotal(): Promise<number> {
+    const { rows } = await this.pool.query<{ total: string }>('SELECT COUNT(*)::text AS total FROM historias.historia_medico');
+    return Number(rows[0]?.total ?? 0);
   }
 }

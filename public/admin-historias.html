@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel privado — Comparte tu historia — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <span class="marca">Medical Pathway — Panel privado</span>
+    </div>
+  </header>
+
+  <div id="vistaLogin" class="admin-contenedor">
+    <div class="tarjeta admin-login">
+      <h1 style="font-size:1.15rem; margin-top:0;">Acceso al panel</h1>
+      <p class="subtitulo" style="font-size:0.85rem;">Solo para uso interno. Las credenciales no se guardan en este navegador.</p>
+      <label for="loginUsuario">Usuario</label>
+      <input id="loginUsuario" type="text" autocomplete="username" />
+      <label for="loginPassword">Contraseña</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" />
+      <button id="btnEntrar" class="btn btn-primario btn-bloque">Entrar</button>
+      <p class="error" id="loginError"></p>
+    </div>
+  </div>
+
+  <div id="vistaPanel" class="admin-contenedor" style="display:none;">
+    <h1 style="font-size:1.3rem;">Respuestas de "Comparte tu historia"</h1>
+
+    <div class="admin-resumen">
+      <div><div class="admin-total" id="totalRespuestas">—</div><div class="pct-etiqueta">total de respuestas</div></div>
+      <div class="pct-etiqueta">Mostrando <span id="totalFiltrado">—</span> con los filtros actuales</div>
+    </div>
+
+    <div class="admin-filtros">
+      <div>
+        <label for="filtroEtapa">Etapa profesional</label>
+        <select id="filtroEtapa">
+          <option value="">Todas</option>
+          <option value="estudiante">Estudiante</option>
+          <option value="internado">Internado</option>
+          <option value="servicio_social">Servicio Social</option>
+          <option value="medico_general">Médico General</option>
+          <option value="residente">Residente</option>
+          <option value="especialista">Especialista</option>
+        </select>
+      </div>
+      <div>
+        <label for="filtroInteres">Nivel de interés</label>
+        <select id="filtroInteres">
+          <option value="">Todos</option>
+          <option value="idea">Solo ha sido una idea</option>
+          <option value="lo_he_pensado_varias_veces">Lo he pensado varias veces</option>
+          <option value="investigando_opciones">Investigando opciones</option>
+          <option value="decidido">Ya decidió</option>
+          <option value="ya_inicie_proceso">Ya inició el proceso</option>
+        </select>
+      </div>
+      <div>
+        <label for="filtroPais">País de interés (contiene)</label>
+        <input id="filtroPais" type="text" placeholder="ej. España" />
+      </div>
+      <div>
+        <label for="filtroPagar">Disposición a pagar</label>
+        <select id="filtroPagar">
+          <option value="">Todas</option>
+          <option value="si">Sí</option>
+          <option value="tal_vez">Tal vez</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+      <div>
+        <label for="filtroBuscar">Buscar en respuestas abiertas</label>
+        <input id="filtroBuscar" type="text" placeholder="palabra clave…" />
+      </div>
+      <button id="btnFiltrar" class="btn btn-secundario">Filtrar</button>
+      <button id="btnExportar" class="btn btn-primario">Exportar respuestas</button>
+    </div>
+
+    <p class="error" id="panelError"></p>
+    <div class="admin-tabla-envoltura">
+      <table class="admin-tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Etapa</th>
+            <th>¿Imaginó ejercer afuera?</th>
+            <th>Nivel de interés</th>
+            <th>Países</th>
+            <th>Barrera principal</th>
+            <th>Incertidumbre</th>
+            <th>Frustración</th>
+            <th>Qué esperaría</th>
+            <th>Pagaría</th>
+            <th>Precio justo</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let credenciales = null;
+
+    function cabeceraAuth() {
+      return { Authorization: 'Basic ' + btoa(`${credenciales.usuario}:${credenciales.password}`) };
+    }
+
+    function construirQuery() {
+      const params = new URLSearchParams();
+      const etapa = document.getElementById('filtroEtapa').value;
+      const interes = document.getElementById('filtroInteres').value;
+      const pais = document.getElementById('filtroPais').value.trim();
+      const pagar = document.getElementById('filtroPagar').value;
+      const buscar = document.getElementById('filtroBuscar').value.trim();
+      if (etapa) params.set('etapa', etapa);
+      if (interes) params.set('interes', interes);
+      if (pais) params.set('pais', pais);
+      if (pagar) params.set('pagar', pagar);
+      if (buscar) params.set('buscar', buscar);
+      return params.toString();
+    }
+
+    function celda(texto) {
+      const div = document.createElement('div');
+      div.textContent = texto ?? '';
+      return div.innerHTML;
+    }
+
+    async function cargarDatos() {
+      document.getElementById('panelError').textContent = '';
+      try {
+        const query = construirQuery();
+        const res = await fetch(`/api/v1/admin/historias${query ? '?' + query : ''}`, { headers: cabeceraAuth() });
+        if (!res.ok) throw new Error(res.status === 401 ? 'Credenciales inválidas.' : `Error ${res.status}`);
+        const data = await res.json();
+        document.getElementById('totalRespuestas').textContent = data.total;
+        document.getElementById('totalFiltrado').textContent = data.resultados;
+        document.getElementById('cuerpoTabla').innerHTML = data.respuestas
+          .map(
+            (r) => `<tr>
+              <td>${new Date(r.creadoEn).toLocaleString('es')}</td>
+              <td>${celda(r.etapaFormacion)}</td>
+              <td>${r.haImaginadoEjercerOtroPais ? 'Sí' : 'No'}</td>
+              <td>${celda(r.serioInteres)}</td>
+              <td>${celda(r.paisesInteres)}</td>
+              <td>${celda(r.queTeHaFrenado)}</td>
+              <td>${celda(r.incertidumbre)}</td>
+              <td>${celda(r.frustracionBusqueda)}</td>
+              <td>${celda(r.queHariaValerLaPena)}</td>
+              <td>${celda(r.consideraPagar)}</td>
+              <td>${celda(r.precioJusto)}</td>
+            </tr>`,
+          )
+          .join('');
+      } catch (e) {
+        document.getElementById('panelError').textContent = e.message;
+      }
+    }
+
+    async function exportar() {
+      document.getElementById('panelError').textContent = '';
+      try {
+        const query = construirQuery();
+        const res = await fetch(`/api/v1/admin/historias/exportar.csv${query ? '?' + query : ''}`, { headers: cabeceraAuth() });
+        if (!res.ok) throw new Error(res.status === 401 ? 'Credenciales inválidas.' : `Error ${res.status}`);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `comparte-tu-historia-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        document.getElementById('panelError').textContent = e.message;
+      }
+    }
+
+    document.getElementById('btnEntrar').addEventListener('click', async () => {
+      document.getElementById('loginError').textContent = '';
+      credenciales = {
+        usuario: document.getElementById('loginUsuario').value,
+        password: document.getElementById('loginPassword').value,
+      };
+      const res = await fetch('/api/v1/admin/historias', { headers: cabeceraAuth() }).catch(() => null);
+      if (!res || !res.ok) {
+        document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos.';
+        credenciales = null;
+        return;
+      }
+      document.getElementById('vistaLogin').style.display = 'none';
+      document.getElementById('vistaPanel').style.display = 'block';
+      cargarDatos();
+    });
+
+    document.getElementById('btnFiltrar').addEventListener('click', cargarDatos);
+    document.getElementById('btnExportar').addEventListener('click', exportar);
+  </script>
+</body>
+</html>

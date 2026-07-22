@@ -375,3 +375,30 @@ details summary { cursor: pointer; font-weight: 600; color: var(--color-primary-
 }
 .historia-final h1 { font-size: 1.9rem; margin-bottom: 1rem; }
 .historia-final p { color: var(--color-text-muted); line-height: 1.7; max-width: 480px; margin: 0 auto 1rem; }
+
+/* --- Panel de administración (interno, protegido — ver AdminBasicAuthGuard) --- */
+.admin-contenedor { max-width: 1100px; margin: 0 auto; padding: 0 1.25rem 3rem; }
+.admin-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 1.25rem;
+}
+.admin-filtros label { font-size: 0.8rem; margin-top: 0; }
+.admin-filtros input, .admin-filtros select { min-width: 160px; margin-top: 0.25rem; padding: 0.45rem 0.6rem; }
+.admin-resumen { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.admin-resumen .admin-total { font-size: 1.6rem; font-weight: 800; color: var(--color-primary-dark); }
+.admin-tabla-envoltura { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius); }
+table.admin-tabla { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+table.admin-tabla th, table.admin-tabla td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  white-space: pre-wrap;
+  max-width: 260px;
+}
+table.admin-tabla th { background: var(--color-bg); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-text-muted); white-space: nowrap; }
+table.admin-tabla tr:last-child td { border-bottom: none; }
+.admin-login { max-width: 380px; margin: 4rem auto; }

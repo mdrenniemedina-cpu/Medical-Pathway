@@ -102,6 +102,8 @@ El free tier de Render se "duerme" tras inactividad (cold start de decenas de se
      | `NODE_ENV` | `production` |
      | `RADAR_K_ANONIMATO_UMBRAL` | `5` |
      | `LOG_LEVEL` | `info` |
+     | `ADMIN_PANEL_USER` | usuario elegido por ti para el panel privado de "Comparte tu historia" (`/admin-historias.html`) |
+     | `ADMIN_PANEL_PASSWORD` | contraseña fuerte, distinta de cualquier otra usada en el proyecto — sin ambas variables, el panel queda inaccesible (fail-closed), nunca abierto |
 
      **No agregues `PORT`** — Render la inyecta automáticamente y `main.ts` ya la lee.
 5. Click **"Create Web Service"**.

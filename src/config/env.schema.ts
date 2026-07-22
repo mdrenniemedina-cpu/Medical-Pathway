@@ -18,6 +18,11 @@ export const envSchema = z.object({
   JWT_REFRESH_TTL_DAYS: z.coerce.number().default(30),
   RADAR_K_ANONIMATO_UMBRAL: z.coerce.number().min(1).default(5),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  CORS_ALLOWED_ORIGINS: z.string().optional(),
+  // Panel privado de "Comparte tu historia" (ver AdminBasicAuthGuard) — sin
+  // definir ambas, el panel queda inaccesible (fail-closed), nunca abierto.
+  ADMIN_PANEL_USER: z.string().optional(),
+  ADMIN_PANEL_PASSWORD: z.string().optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
