@@ -31,4 +31,5 @@ Cada fila: qué se probó, qué se esperaba, qué pasó realmente, clasificació
 
 | # | Fecha | Área | Qué se esperaba | Qué pasó | Clasificación | Estado |
 |---|---|---|---|---|---|---|
-| — | — | — | — | (sin hallazgos todavía) | — | — |
+| 1 | 2026-07-20 | Onboarding paso 1 (móvil real, iPhone Safari) | Registro → perfil creado automáticamente (outbox) → onboarding se ve bien en móvil | Todo correcto: aviso de beta legible, formulario responsive, botón táctil, sesión autenticada llegó a onboarding sin fricción | — (verificación exitosa, sin defecto) | Confirmado OK |
+| 2 | 2026-07-20 | Onboarding paso 1 — campo "País donde te graduaste" | Un usuario real sabe qué escribir | Pide código ISO de 2 letras (ej. "CO") en un `<input>` de texto libre — un usuario sin ese conocimiento previo puede no saber el código o escribirlo mal (minúsculas, nombre completo, error de tipeo) sin validación ni autocompletado | 🟡 Mejora para V2 | Documentado — candidato a selector de país por nombre en vez de código libre |
