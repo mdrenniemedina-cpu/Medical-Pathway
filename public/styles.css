@@ -240,3 +240,138 @@ progress::-webkit-progress-value { background: var(--color-primary); border-radi
 }
 
 details summary { cursor: pointer; font-weight: 600; color: var(--color-primary-dark); }
+
+/* --- Comparte tu historia (instrumento de descubrimiento cualitativo) ---
+   Deliberadamente más espaciado y silencioso que el resto de la app: no es
+   una pantalla de producto, es una invitación a conversar. */
+.historia-contenedor {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.historia-marca {
+  display: block;
+  padding: 1.75rem 0 0;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  font-size: 1rem;
+}
+.historia-hero {
+  padding: 3rem 0 2.5rem;
+  text-align: left;
+}
+.historia-hero h1 {
+  font-size: 2.1rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.25rem;
+}
+.historia-hero .historia-subtitulo {
+  font-size: 1.15rem;
+  color: var(--color-text);
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+.historia-hero p {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+.historia-indicadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 1.75rem 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+.historia-indicadores span { white-space: nowrap; }
+.historia-cierre-hero {
+  margin-top: 2.5rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.25rem;
+}
+
+.historia-progreso-envoltura {
+  margin: 0 0 1.75rem;
+}
+.historia-progreso-etiqueta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.4rem;
+}
+.historia-progreso-barra {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.historia-progreso-relleno {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.historia-pregunta {
+  animation: historia-aparecer 0.45s ease;
+}
+@keyframes historia-aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.historia-pregunta h2 {
+  font-size: 1.35rem;
+  line-height: 1.35;
+  margin: 0 0 1.5rem;
+}
+.historia-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.historia-opcion {
+  text-align: left;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 0.98rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.historia-opcion:hover { border-color: var(--color-primary); background: var(--color-primary-light); }
+.historia-opcion.seleccionada { border-color: var(--color-primary); background: var(--color-primary-light); font-weight: 600; }
+
+.historia-texto-libre {
+  width: 100%;
+  min-height: 110px;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 0.98rem;
+  resize: vertical;
+}
+.historia-texto-libre:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
+
+.historia-navegacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.75rem;
+}
+
+.historia-final {
+  padding: 4rem 0;
+  text-align: center;
+}
+.historia-final h1 { font-size: 1.9rem; margin-bottom: 1rem; }
+.historia-final p { color: var(--color-text-muted); line-height: 1.7; max-width: 480px; margin: 0 auto 1rem; }

@@ -14,6 +14,7 @@ import { ComunidadModule } from '@contexts/comunidad/public-api';
 import { OportunidadesModule } from '@contexts/oportunidades/public-api';
 import { NotificacionesModule } from '@contexts/notificaciones/public-api';
 import { AnalyticsModule } from '@infrastructure/analytics/analytics.module';
+import { HistoriasModule } from '@infrastructure/historias/historias.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
 
@@ -42,6 +43,7 @@ import { join } from 'node:path';
     OportunidadesModule,
     NotificacionesModule,
     AnalyticsModule,
+    HistoriasModule,
     // Sirve el frontend mínimo del Sprint 1 (public/) en '/'. La API vive
     // bajo el prefijo global 'api/v1' (ver main.ts) precisamente para que
     // no haya colisión de rutas entre el frontend estático y los endpoints.

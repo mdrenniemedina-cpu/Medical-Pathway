@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Comparte tu historia — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <a class="historia-marca" href="/">Medical Pathway</a>
+
+  <div class="historia-contenedor">
+    <section id="hero" class="historia-hero">
+      <h1>Toda gran decisión comienza con una pregunta.</h1>
+      <p class="historia-subtitulo">¿Alguna vez has imaginado ejercer medicina en otro país?</p>
+      <p>
+        Para algunos es solo una idea. Para otros, un sueño que parece lejano. Y para muchos, el inicio
+        de un camino lleno de dudas, información contradictoria y preguntas difíciles de responder.
+      </p>
+      <p>
+        En Medical Pathway creemos que antes de construir una plataforma, debemos comprender las
+        experiencias reales de quienes recorrerán ese camino.
+      </p>
+      <p><strong>Queremos escucharte.</strong></p>
+      <p>
+        No importa si hoy eres estudiante, interno, médico general, residente o especialista. Si alguna
+        vez has pensado en ejercer medicina fuera de tu país, tu experiencia puede ayudarnos a construir
+        una herramienta más útil para toda la comunidad médica.
+      </p>
+
+      <div class="historia-indicadores">
+        <span>⏱ Menos de 5 minutos</span>
+        <span>🔒 Respuestas confidenciales</span>
+        <span>❤️ Construido junto a la comunidad médica</span>
+      </div>
+
+      <button class="btn btn-primario" id="btnComenzar">Compartir mi historia</button>
+
+      <p class="historia-cierre-hero">Las mejores herramientas no nacen de asumir respuestas. Nacen de hacer las preguntas correctas.</p>
+    </section>
+
+    <section id="formulario" class="tarjeta" style="display:none; padding: 1.75rem;">
+      <div class="historia-progreso-envoltura">
+        <div class="historia-progreso-etiqueta">
+          <span id="progresoTexto">Pregunta 1 de 10</span>
+          <span id="progresoPorcentaje">10%</span>
+        </div>
+        <div class="historia-progreso-barra"><div class="historia-progreso-relleno" id="progresoRelleno" style="width: 10%;"></div></div>
+      </div>
+      <div id="preguntaActual"></div>
+    </section>
+
+    <section id="final" class="historia-final" style="display:none;">
+      <h1 id="finalTitulo">Gracias por compartir tu historia.</h1>
+      <p id="finalTexto"></p>
+      <a class="btn btn-primario" href="/">Volver al inicio</a>
+    </section>
+  </div>
+
+  <footer class="pie historia-contenedor">
+    <p>Medical Pathway — información con fines orientativos, no constituye asesoría legal ni migratoria.</p>
+  </footer>
+
+  <script src="/config.js"></script>
+  <script>
+    const API_BASE = window.__API_BASE__ || '/api/v1';
+
+    const PREGUNTAS = [
+      {
+        clave: 'etapaFormacion', tipo: 'opciones',
+        titulo: '¿En qué etapa de tu formación profesional te encuentras?',
+        opciones: [
+          ['estudiante', 'Estudiante'],
+          ['internado', 'Internado'],
+          ['servicio_social', 'Servicio Social'],
+          ['medico_general', 'Médico General'],
+          ['residente', 'Residente'],
+          ['especialista', 'Especialista'],
+        ],
+      },
+      {
+        clave: 'haImaginadoEjercerOtroPais', tipo: 'booleano',
+        titulo: '¿Alguna vez has imaginado ejercer medicina en otro país?',
+      },
+      {
+        clave: 'serioInteres', tipo: 'opciones',
+        titulo: '¿Qué tan serio ha sido ese interés?',
+        opciones: [
+          ['idea', 'Solo ha sido una idea.'],
+          ['lo_he_pensado_varias_veces', 'Lo he pensado varias veces.'],
+          ['investigando_opciones', 'Estoy investigando opciones.'],
+          ['decidido', 'Ya decidí que quiero hacerlo.'],
+          ['ya_inicie_proceso', 'Ya inicié el proceso.'],
+        ],
+      },
+      { clave: 'paisesInteres', tipo: 'texto_corto', titulo: '¿Qué país o países te interesan?' },
+      { clave: 'queTeHaFrenado', tipo: 'texto_libre', titulo: '¿Qué es lo que más te ha frenado hasta ahora para explorar esa posibilidad?' },
+      { clave: 'incertidumbre', tipo: 'texto_libre', titulo: 'Cuando piensas en ejercer medicina en otro país, ¿qué es lo que más incertidumbre te genera?' },
+      { clave: 'frustracionBusqueda', tipo: 'texto_libre', titulo: 'Cuando buscas información, ¿qué es lo que más te frustra?' },
+      {
+        clave: 'queHariaValerLaPena', tipo: 'texto_libre',
+        titulo: 'Imagina que existiera una plataforma diseñada específicamente para acompañarte durante este camino. ¿Qué tendría que hacer para que pensaras "Esto realmente vale la pena"?',
+      },
+      {
+        clave: 'consideraPagar', tipo: 'opciones',
+        titulo: 'Si una plataforma pudiera ayudarte a evitar errores costosos, organizar cada paso del proceso y centralizar información confiable, ¿considerarías pagar por ella?',
+        opciones: [['si', 'Sí'], ['tal_vez', 'Tal vez'], ['no', 'No']],
+      },
+      {
+        clave: 'precioJusto', tipo: 'opciones',
+        titulo: '¿Qué precio considerarías justo?',
+        opciones: [
+          ['menos_5', 'Menos de USD 5'],
+          ['5_10', 'USD 5–10'],
+          ['10_20', 'USD 10–20'],
+          ['20_30', 'USD 20–30'],
+          ['30_50', 'USD 30–50'],
+          ['mas_50', 'Más de USD 50'],
+        ],
+      },
+    ];
+
+    const respuestas = {};
+    let indice = 0;
+
+    function enviar(completado) {
+      fetch(`${API_BASE}/historias`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...respuestas, completado }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+
+    function mostrarFinalCorto() {
+      document.getElementById('formulario').style.display = 'none';
+      document.getElementById('finalTitulo').textContent = 'Gracias por tu tiempo.';
+      document.getElementById('finalTexto').textContent =
+        'Aun si hoy no es algo que te interese, agradecemos mucho que te hayas tomado un momento. Si en el futuro cambia, aquí vamos a estar.';
+      document.getElementById('final').style.display = 'block';
+      enviar(false);
+    }
+
+    function mostrarFinalCompleto() {
+      document.getElementById('formulario').style.display = 'none';
+      document.getElementById('finalTitulo').textContent = 'Gracias por compartir tu historia.';
+      document.getElementById('finalTexto').textContent =
+        'Cada respuesta nos ayuda a comprender mejor los desafíos que enfrentan los médicos latinoamericanos cuando consideran ejercer medicina en otro país. Medical Pathway no será construido a partir de suposiciones, sino de las experiencias de quienes viven este camino. Gracias por ayudarnos a construir algo que esperamos pueda facilitar las decisiones de miles de médicos en el futuro.';
+      document.getElementById('final').style.display = 'block';
+      enviar(true);
+    }
+
+    function actualizarProgreso() {
+      const total = PREGUNTAS.length;
+      const actual = indice + 1;
+      const porcentaje = Math.round((actual / total) * 100);
+      document.getElementById('progresoTexto').textContent = `Pregunta ${actual} de ${total}`;
+      document.getElementById('progresoPorcentaje').textContent = `${porcentaje}%`;
+      document.getElementById('progresoRelleno').style.width = `${porcentaje}%`;
+    }
+
+    function siguiente(valor) {
+      const pregunta = PREGUNTAS[indice];
+      respuestas[pregunta.clave] = valor;
+
+      if (pregunta.clave === 'haImaginadoEjercerOtroPais' && valor === false) {
+        mostrarFinalCorto();
+        return;
+      }
+
+      if (indice === PREGUNTAS.length - 1) {
+        mostrarFinalCompleto();
+        return;
+      }
+
+      indice += 1;
+      renderPregunta();
+    }
+
+    function renderPregunta() {
+      actualizarProgreso();
+      const pregunta = PREGUNTAS[indice];
+      const contenedor = document.getElementById('preguntaActual');
+
+      let html = `<div class="historia-pregunta"><h2>${pregunta.titulo}</h2>`;
+
+      if (pregunta.tipo === 'opciones') {
+        html += '<div class="historia-opciones">';
+        for (const [valor, etiqueta] of pregunta.opciones) {
+          html += `<button type="button" class="historia-opcion" data-valor="${valor}">${etiqueta}</button>`;
+        }
+        html += '</div>';
+      } else if (pregunta.tipo === 'booleano') {
+        html += `<div class="historia-opciones">
+          <button type="button" class="historia-opcion" data-valor="true">Sí</button>
+          <button type="button" class="historia-opcion" data-valor="false">No</button>
+        </div>`;
+      } else if (pregunta.tipo === 'texto_corto') {
+        html += `<input type="text" id="inputTexto" class="historia-texto-libre" style="min-height:auto;" placeholder="Escribe aquí…" />
+          <div class="historia-navegacion"><button type="button" class="btn btn-primario" id="btnContinuarTexto">Continuar</button></div>`;
+      } else {
+        html += `<textarea id="inputTexto" class="historia-texto-libre" placeholder="Escribe aquí, con la confianza de que esto es una conversación, no un examen…"></textarea>
+          <div class="historia-navegacion"><button type="button" class="btn btn-primario" id="btnContinuarTexto">Continuar</button></div>`;
+      }
+
+      html += '</div>';
+      contenedor.innerHTML = html;
+
+      if (pregunta.tipo === 'opciones' || pregunta.tipo === 'booleano') {
+        contenedor.querySelectorAll('.historia-opcion').forEach((boton) => {
+          boton.addEventListener('click', () => {
+            contenedor.querySelectorAll('.historia-opcion').forEach((b) => b.classList.remove('seleccionada'));
+            boton.classList.add('seleccionada');
+            const valorCrudo = boton.getAttribute('data-valor');
+            const valor = valorCrudo === 'true' ? true : valorCrudo === 'false' ? false : valorCrudo;
+            setTimeout(() => siguiente(valor), 220);
+          });
+        });
+      } else {
+        document.getElementById('btnContinuarTexto').addEventListener('click', () => {
+          const valor = document.getElementById('inputTexto').value.trim();
+          siguiente(valor);
+        });
+      }
+    }
+
+    document.getElementById('btnComenzar').addEventListener('click', () => {
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('formulario').style.display = 'block';
+      renderPregunta();
+    });
+  </script>
+</body>
+</html>
