@@ -2,14 +2,22 @@
 
 > Módulo privado, aislado del resto de Medical Pathway (ver bounded context `src/bounded-contexts/academia-privada/`), para validar una futura funcionalidad de formación. No aparece en la navegación pública. Ruta: `/academia/reporte-caso.html`.
 
-## Cómo dar acceso a una estudiante (directamente en la base de datos)
+## Cómo dar acceso a una estudiante (sin SQL — formulario móvil)
 
-1. La persona debe **registrarse primero** en Medical Pathway (email/contraseña, como cualquier usuario) — así obtenemos su `cuenta_id`.
-2. Consulta su `cuenta_id`:
+1. La persona debe **registrarse primero** en Medical Pathway (email/contraseña, como cualquier usuario).
+2. Abre `/academia/admin-acceso.html` desde cualquier navegador (celular o computadora) e ingresa las mismas credenciales del panel de "Comparte tu historia" (`ADMIN_PANEL_USER`/`ADMIN_PANEL_PASSWORD`).
+3. Escribe el email con el que la persona se registró, opcionalmente una fecha de expiración, y pulsa **Conceder acceso**. No necesitas conocer ni buscar su `cuenta_id` — el sistema lo resuelve internamente a partir del email.
+4. Para revocar o pausar el acceso, escribe el mismo email y pulsa **Revocar acceso**.
+
+Esto llama a `POST /api/v1/academia/admin/acceso` (protegido con `AdminBasicAuthGuard`, mismo mecanismo que `/admin/historias`), con cuerpo `{ email, habilitado?, fechaExpiracion? }`. Devuelve `404` si el email no corresponde a ninguna cuenta registrada.
+
+## Alternativa: directamente en la base de datos (si prefieres SQL)
+
+1. Consulta su `cuenta_id`:
    ```sql
    SELECT id, email FROM identidad.cuenta WHERE email = 'ejemplo@correo.com';
    ```
-3. Concede acceso (sin fecha de expiración):
+2. Concede acceso (sin fecha de expiración):
    ```sql
    INSERT INTO academia_privada.acceso_curso (id, cuenta_id, curso_id, habilitado, fecha_expiracion)
    VALUES (gen_random_uuid()::text, '<cuenta_id>', 'reporte-caso', true, NULL);
@@ -20,7 +28,7 @@
    VALUES (gen_random_uuid()::text, '<cuenta_id>', 'reporte-caso', true, now() + interval '60 days');
    ```
 
-## Cómo revocar o pausar el acceso
+## Cómo revocar o pausar el acceso (SQL)
 
 ```sql
 UPDATE academia_privada.acceso_curso SET habilitado = false WHERE cuenta_id = '<cuenta_id>';

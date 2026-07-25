@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel privado — Acceso a Academia — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <span class="marca">Medical Pathway — Acceso a Academia</span>
+    </div>
+  </header>
+
+  <div id="vistaLogin" class="admin-contenedor">
+    <div class="tarjeta admin-login">
+      <h1 style="font-size:1.15rem; margin-top:0;">Acceso al panel</h1>
+      <p class="subtitulo" style="font-size:0.85rem;">Solo para uso interno. Las credenciales no se guardan en este navegador.</p>
+      <label for="loginUsuario">Usuario</label>
+      <input id="loginUsuario" type="text" autocomplete="username" />
+      <label for="loginPassword">Contraseña</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" />
+      <button id="btnEntrar" class="btn btn-primario btn-bloque">Entrar</button>
+      <p class="error" id="loginError"></p>
+    </div>
+  </div>
+
+  <div id="vistaPanel" class="admin-contenedor" style="display:none;">
+    <h1 style="font-size:1.3rem;">Conceder o revocar acceso al curso</h1>
+    <p class="subtitulo" style="font-size:0.85rem;">La persona debe haberse registrado antes en Medical Pathway con este email. No necesitas su ID ni acceso a la base de datos.</p>
+
+    <div class="tarjeta">
+      <label for="campoEmail">Email de la estudiante</label>
+      <input id="campoEmail" type="email" autocomplete="off" placeholder="ejemplo@correo.com" />
+
+      <label for="campoExpiracion">Fecha de expiración del acceso (opcional)</label>
+      <input id="campoExpiracion" type="date" />
+
+      <div style="display:flex; gap:0.75rem; margin-top:1rem;">
+        <button id="btnConceder" class="btn btn-primario">Conceder acceso</button>
+        <button id="btnRevocar" class="btn btn-secundario">Revocar acceso</button>
+      </div>
+
+      <p class="error" id="panelError"></p>
+      <p id="panelExito" style="display:none; color: var(--color-exito, #1a7f37);"></p>
+    </div>
+  </div>
+
+  <script>
+    let credenciales = null;
+
+    function cabeceraAuth() {
+      return {
+        Authorization: 'Basic ' + btoa(`${credenciales.usuario}:${credenciales.password}`),
+        'Content-Type': 'application/json',
+      };
+    }
+
+    function mostrarError(mensaje) {
+      document.getElementById('panelExito').style.display = 'none';
+      document.getElementById('panelError').textContent = mensaje;
+    }
+
+    function mostrarExito(mensaje) {
+      document.getElementById('panelError').textContent = '';
+      const exito = document.getElementById('panelExito');
+      exito.textContent = mensaje;
+      exito.style.display = 'block';
+    }
+
+    async function enviarAcceso(habilitado) {
+      mostrarError('');
+      const email = document.getElementById('campoEmail').value.trim();
+      const fecha = document.getElementById('campoExpiracion').value;
+      if (!email) {
+        mostrarError('Escribe el email de la estudiante.');
+        return;
+      }
+      try {
+        const cuerpo = { email, habilitado };
+        if (habilitado && fecha) cuerpo.fechaExpiracion = fecha;
+        const res = await fetch('/api/v1/academia/admin/acceso', {
+          method: 'POST',
+          headers: cabeceraAuth(),
+          body: JSON.stringify(cuerpo),
+        });
+        if (!res.ok) {
+          if (res.status === 401) throw new Error('Credenciales inválidas.');
+          if (res.status === 404) throw new Error('No existe ninguna cuenta registrada con ese email.');
+          const data = await res.json().catch(() => null);
+          throw new Error(data?.message || `Error ${res.status}`);
+        }
+        mostrarExito(habilitado ? `Acceso concedido a ${email}.` : `Acceso revocado a ${email}.`);
+      } catch (e) {
+        mostrarError(e.message);
+      }
+    }
+
+    document.getElementById('btnEntrar').addEventListener('click', async () => {
+      document.getElementById('loginError').textContent = '';
+      credenciales = {
+        usuario: document.getElementById('loginUsuario').value,
+        password: document.getElementById('loginPassword').value,
+      };
+      const res = await fetch('/api/v1/admin/historias', { headers: cabeceraAuth() }).catch(() => null);
+      if (!res || !res.ok) {
+        document.getElementById('loginError').textContent = 'Usuario o contraseña incorrectos.';
+        credenciales = null;
+        return;
+      }
+      document.getElementById('vistaLogin').style.display = 'none';
+      document.getElementById('vistaPanel').style.display = 'block';
+    });
+
+    document.getElementById('btnConceder').addEventListener('click', () => enviarAcceso(true));
+    document.getElementById('btnRevocar').addEventListener('click', () => enviarAcceso(false));
+  </script>
+</body>
+</html>

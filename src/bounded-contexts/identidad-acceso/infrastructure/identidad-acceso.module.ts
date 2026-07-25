@@ -9,6 +9,7 @@ import { TOKEN_ISSUER } from '../application/token-issuer.port';
 import { JwtTokenIssuer } from './jwt-token-issuer';
 import { RegistrarCuentaUseCase } from '../application/registrar-cuenta.use-case';
 import { IniciarSesionUseCase } from '../application/iniciar-sesion.use-case';
+import { BuscarCuentaIdPorEmailUseCase } from '../application/buscar-cuenta-id-por-email.use-case';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -22,9 +23,10 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     { provide: TOKEN_ISSUER, useClass: JwtTokenIssuer },
     RegistrarCuentaUseCase,
     IniciarSesionUseCase,
+    BuscarCuentaIdPorEmailUseCase,
     JwtStrategy,
     JwtAuthGuard,
   ],
-  exports: [JwtAuthGuard],
+  exports: [JwtAuthGuard, BuscarCuentaIdPorEmailUseCase],
 })
 export class IdentidadAccesoModule {}

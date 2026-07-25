@@ -9,3 +9,4 @@ export { JwtAuthGuard } from '../infrastructure/jwt-auth.guard';
 export { CurrentAccount } from '../infrastructure/current-account.decorator';
 export type { JwtPayload } from '../infrastructure/jwt.strategy';
 export { CuentaRegistradaEvent } from '../domain/events/cuenta-registrada.event';
+export { BuscarCuentaIdPorEmailUseCase } from '../application/buscar-cuenta-id-por-email.use-case';

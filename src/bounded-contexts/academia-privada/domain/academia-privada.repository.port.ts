@@ -5,4 +5,5 @@ export const ACCESO_CURSO_REPOSITORY = Symbol('ACCESO_CURSO_REPOSITORY');
 export interface AccesoCursoRepositoryPort {
   buscar(cuentaId: string, cursoId: string): Promise<AccesoCursoProps | null>;
   registrarVisualizacion(cuentaId: string, cursoId: string, recurso: string): Promise<void>;
+  otorgarAcceso(cuentaId: string, cursoId: string, habilitado: boolean, fechaExpiracion: Date | null): Promise<void>;
 }

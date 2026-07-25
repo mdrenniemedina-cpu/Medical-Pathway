@@ -40,4 +40,14 @@ export class AcademiaPrivadaRepository implements AccesoCursoRepositoryPort {
       [nanoid(), cuentaId, cursoId, recurso],
     );
   }
+
+  async otorgarAcceso(cuentaId: string, cursoId: string, habilitado: boolean, fechaExpiracion: Date | null): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO academia_privada.acceso_curso (id, cuenta_id, curso_id, habilitado, fecha_expiracion)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (cuenta_id, curso_id)
+       DO UPDATE SET habilitado = EXCLUDED.habilitado, fecha_expiracion = EXCLUDED.fecha_expiracion`,
+      [nanoid(), cuentaId, cursoId, habilitado, fechaExpiracion],
+    );
+  }
 }
