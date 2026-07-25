@@ -78,9 +78,7 @@ export class AcademiaPrivadaController {
       return;
     }
 
-    const coincidencia = /bytes=(\d*)-(\d*)/.exec(rango);
-    const inicio = coincidencia?.[1] ? parseInt(coincidencia[1], 10) : 0;
-    const fin = coincidencia?.[2] ? parseInt(coincidencia[2], 10) : tamano - 1;
+    const { inicio, fin } = this.calcularRangoBytes(rango, tamano);
     res.writeHead(206, {
       'Content-Range': `bytes ${inicio}-${fin}/${tamano}`,
       'Accept-Ranges': 'bytes',
@@ -88,5 +86,38 @@ export class AcademiaPrivadaController {
       'Content-Type': tipoMime,
     });
     createReadStream(ruta, { start: inicio, end: fin }).pipe(res);
+  }
+
+  /**
+   * Soporta las 3 formas válidas de cabecera Range (RFC 7233 §2.1):
+   * `bytes=X-Y` (rango explícito), `bytes=X-` (desde X hasta el final), y
+   * `bytes=-N` (rango "sufijo": los últimos N bytes).
+   *
+   * BUG REAL encontrado y corregido: la implementación anterior no
+   * distinguía `bytes=-N` de `bytes=X-` y trataba el sufijo como si fuera
+   * "los primeros N bytes" — el navegador usa exactamente `bytes=-N` para
+   * localizar el átomo `moov` (metadatos) al final de un MP4 no optimizado
+   * para streaming progresivo (el caso típico de un video grabado
+   * directamente con el teléfono). Con el bug, el navegador recibía el
+   * principio del archivo en vez del final, nunca encontraba `moov`, y
+   * Chromium reportaba "DEMUXER_ERROR_NO_SUPPORTED_STREAMS" — el video
+   * parecía "no soportado" cuando en realidad el archivo era válido
+   * (confirmado descargando el archivo completo y comparándolo byte a
+   * byte con el original).
+   */
+  private calcularRangoBytes(rango: string, tamano: number): { inicio: number; fin: number } {
+    const coincidencia = /bytes=(\d*)-(\d*)/.exec(rango);
+    const inicioTexto = coincidencia?.[1] ?? '';
+    const finTexto = coincidencia?.[2] ?? '';
+
+    if (!inicioTexto && finTexto) {
+      // Rango sufijo: "bytes=-N" == los últimos N bytes del archivo.
+      const n = parseInt(finTexto, 10);
+      return { inicio: Math.max(tamano - n, 0), fin: tamano - 1 };
+    }
+
+    const inicio = inicioTexto ? parseInt(inicioTexto, 10) : 0;
+    const fin = finTexto ? parseInt(finTexto, 10) : tamano - 1;
+    return { inicio, fin };
   }
 }
