@@ -104,6 +104,8 @@ El free tier de Render se "duerme" tras inactividad (cold start de decenas de se
      | `LOG_LEVEL` | `info` |
      | `ADMIN_PANEL_USER` | usuario elegido por ti para el panel privado de "Comparte tu historia" (`/admin-historias.html`) |
      | `ADMIN_PANEL_PASSWORD` | contraseña fuerte, distinta de cualquier otra usada en el proyecto — sin ambas variables, el panel queda inaccesible (fail-closed), nunca abierto |
+     | `ACADEMIA_TOKEN_SECRET` | secreto propio para el módulo privado de Academia (ver `docs/34-academia-privada-operacion.md`) — otro `openssl rand -hex 32`, distinto de los anteriores |
+     | `ACADEMIA_ARCHIVOS_DIR` | ruta de un disco persistente de Render (ver `docs/34`) — sin disco persistente, los videos/PDF se pierden en cada redeploy |
 
      **No agregues `PORT`** — Render la inyecta automáticamente y `main.ts` ya la lee.
 5. Click **"Create Web Service"**.

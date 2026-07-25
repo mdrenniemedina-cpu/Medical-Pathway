@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
-import { AdminBasicAuthGuard } from './admin-basic-auth.guard';
+import { AdminBasicAuthGuard } from '@infrastructure/admin/admin-basic-auth.guard';
 import { FiltrosHistorias, HistoriaMedicoRepository, HistoriaMedicoRow } from './historia-medico.repository';
 import {
   ETIQUETA_CONSIDERA_PAGAR,

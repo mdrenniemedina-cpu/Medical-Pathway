@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Elaboración de Reporte de Caso — Medical Pathway</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-interior">
+      <span class="marca">Medical Pathway</span>
+    </div>
+  </header>
+
+  <div id="cargando" class="contenedor cargando"><div class="spinner"></div><span>Verificando tu acceso…</span></div>
+
+  <div id="restringido" class="contenedor acceso-restringido" style="display:none;">
+    <h1 style="font-size:1.2rem;">Acceso restringido</h1>
+    <p class="subtitulo">Este contenido es privado y por ahora solo está disponible para participantes autorizados directamente por el equipo de Medical Pathway.</p>
+  </div>
+
+  <div id="curso" class="contenedor" style="display:none; max-width: 640px;">
+    <h1 style="font-size:1.3rem;">Elaboración de Reporte de Caso</h1>
+
+    <div class="tarjeta">
+      <div class="curso-recurso">
+        <h3>Video 1</h3>
+        <video id="video-video-1" controls preload="none"></video>
+      </div>
+      <div class="curso-recurso">
+        <h3>Video 2</h3>
+        <video id="video-video-2" controls preload="none"></video>
+      </div>
+      <div class="curso-recurso">
+        <h3>Video 3</h3>
+        <video id="video-video-3" controls preload="none"></video>
+      </div>
+      <div class="curso-recurso">
+        <h3>Recursos descargables</h3>
+        <a id="enlace-guia-care" class="btn btn-secundario" href="#">Descargar guías CARE (PDF)</a>
+      </div>
+      <div class="curso-recurso">
+        <h3>Tu borrador</h3>
+        <div class="curso-proximamente">Próximamente — aquí podrás subir tu borrador para recibir retroalimentación.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/config.js"></script>
+  <script src="/app.js"></script>
+  <script>
+    async function cargarRecurso(recurso, aplicar) {
+      const data = await api('/academia/reproducir', { method: 'POST', body: JSON.stringify({ recurso }) });
+      aplicar(data.url);
+    }
+
+    async function iniciar() {
+      requireAuth();
+      try {
+        const acceso = await api('/academia/mi-acceso');
+        document.getElementById('cargando').style.display = 'none';
+        if (!acceso.autorizado) {
+          document.getElementById('restringido').style.display = 'block';
+          return;
+        }
+        document.getElementById('curso').style.display = 'block';
+
+        for (const recurso of ['video-1', 'video-2', 'video-3']) {
+          await cargarRecurso(recurso, (url) => { document.getElementById(`video-${recurso}`).src = url; });
+        }
+        await cargarRecurso('guia-care', (url) => { document.getElementById('enlace-guia-care').href = url; });
+      } catch (e) {
+        document.getElementById('cargando').style.display = 'none';
+        document.getElementById('restringido').style.display = 'block';
+      }
+    }
+    iniciar();
+  </script>
+</body>
+</html>

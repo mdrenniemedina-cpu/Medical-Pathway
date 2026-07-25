@@ -23,6 +23,11 @@ export const envSchema = z.object({
   // definir ambas, el panel queda inaccesible (fail-closed), nunca abierto.
   ADMIN_PANEL_USER: z.string().optional(),
   ADMIN_PANEL_PASSWORD: z.string().optional(),
+  // Academia Privada (MVP de un curso) — ver AcademiaTokenService y
+  // AcademiaArchivosService. Sin ACADEMIA_TOKEN_SECRET, ningún token de
+  // reproducción puede firmarse ni verificarse (falla explícitamente).
+  ACADEMIA_TOKEN_SECRET: z.string().optional(),
+  ACADEMIA_ARCHIVOS_DIR: z.string().optional(),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

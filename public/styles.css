@@ -402,3 +402,22 @@ table.admin-tabla th, table.admin-tabla td {
 table.admin-tabla th { background: var(--color-bg); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-text-muted); white-space: nowrap; }
 table.admin-tabla tr:last-child td { border-bottom: none; }
 .admin-login { max-width: 380px; margin: 4rem auto; }
+
+/* --- Academia Privada (MVP de un curso) --- */
+.curso-recurso {
+  margin: 1.25rem 0;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.curso-recurso:last-child { border-bottom: none; }
+.curso-recurso h3 { font-size: 1rem; margin: 0 0 0.6rem; }
+.curso-recurso video { width: 100%; border-radius: var(--radius); background: #000; }
+.curso-proximamente {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  border: 1px dashed var(--color-border);
+}
+.acceso-restringido { max-width: 420px; margin: 4rem auto; text-align: center; }
