@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { timingSafeEqual } from 'node:crypto';
 import { Request } from 'express';
@@ -33,6 +33,8 @@ function comparacionSegura(a: string, b: string): boolean {
  */
 @Injectable()
 export class AdminBasicAuthGuard implements CanActivate {
+  private readonly logger = new Logger(AdminBasicAuthGuard.name);
+
   constructor(private readonly config: ConfigService) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -55,7 +57,17 @@ export class AdminBasicAuthGuard implements CanActivate {
     const usuario = separador >= 0 ? decodificado.slice(0, separador) : '';
     const password = separador >= 0 ? decodificado.slice(separador + 1) : '';
 
-    if (!comparacionSegura(usuario, usuarioEsperado) || !comparacionSegura(password, passwordEsperada)) {
+    const usuarioCoincide = comparacionSegura(usuario, usuarioEsperado);
+    const passwordCoincide = comparacionSegura(password, passwordEsperada);
+
+    if (!usuarioCoincide || !passwordCoincide) {
+      // Diagnóstico seguro: solo longitudes y coincidencia, NUNCA el contenido
+      // recibido ni el esperado — así se puede detectar por ejemplo un
+      // espacio/salto de línea de más al copiar la variable desde Render,
+      // sin exponer ningún secreto en los logs.
+      this.logger.warn(
+        `Intento de login admin inválido — usuarioCoincide=${usuarioCoincide} (recibido=${usuario.length} esperado=${usuarioEsperado.length} chars) passwordCoincide=${passwordCoincide} (recibido=${password.length} esperado=${passwordEsperada.length} chars) separadorEncontrado=${separador >= 0}`,
+      );
       throw new UnauthorizedException('Credenciales inválidas.');
     }
 
